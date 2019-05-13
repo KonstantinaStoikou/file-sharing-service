@@ -28,7 +28,6 @@ int main(int argc, char const *argv[]) {
 
     // reap dead children asynchronously
     signal(SIGCHLD, sigchld_handler);
-
     // create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror(RED "Error while creating socket" RESET);
@@ -90,9 +89,7 @@ int main(int argc, char const *argv[]) {
         }
         // parent closes socket to client
         // must be closed before it gets re-assigned
-        printf("hi1\n");
         close(newsock);
-        printf("hi2\n");
     }
     return 0;
 }
