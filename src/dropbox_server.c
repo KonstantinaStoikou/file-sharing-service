@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -11,6 +10,12 @@
 #include "../include/defines.h"
 #include "../include/read_functions.h"
 
+// wait for all dead child processes
+void sigchld_handler(int sig) {
+    while (waitpid(-1, NULL, WNOHANG) > 0)
+        ;
+}
+
 int main(int argc, char const *argv[]) {
     int port, sock, newsock;
     struct sockaddr_in server, client;
@@ -22,12 +27,17 @@ int main(int argc, char const *argv[]) {
     read_server_arguments(argc, argv, &port);
 
     // reap dead children asynchronously
-    // signal(SIGCHLD, sigchld_handler);
+    signal(SIGCHLD, sigchld_handler);
 
     // create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror(RED "Error while creating socket" RESET);
         exit(EXIT_FAILURE);
+    }
+    // override fails in bind
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) <
+        0) {
+        perror(RED "setsockopt(SO_REUSEADDR) failed" RESET);
     }
     // internet domain
     server.sin_family = AF_INET;
@@ -66,19 +76,12 @@ int main(int argc, char const *argv[]) {
             char buf[1];
             // receive 1 char
             while (read(newsock, buf, 1) > 0) {
-                putchar(buf[0]); /* Print received char */
-                /* Capitalize character */
-                buf[0] = toupper(buf[0]);
-                /* Reply */
-                if (write(newsock, buf, 1) < 0) {
-                    perror(RED "Error while writing" RESET);
-                    exit(EXIT_FAILURE);
-                }
-                printf("Closing connection.\n");
-                // close socket
-                close(newsock);
-                exit(EXIT_SUCCESS);
+                putchar(buf[0]);
             }
+            printf("Closing connection.\n");
+            // close socket
+            close(newsock);
+            exit(EXIT_SUCCESS);
         }
         // if error in fork
         else if (pid == -1) {
@@ -87,8 +90,9 @@ int main(int argc, char const *argv[]) {
         }
         // parent closes socket to client
         // must be closed before it gets re-assigned
+        printf("hi1\n");
         close(newsock);
-
-        return 0;
+        printf("hi2\n");
     }
+    return 0;
 }
