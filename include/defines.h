@@ -12,5 +12,9 @@
 
 // the size of the socket buffer
 #define BUF_SIZE 200
+// the size of the buffer for the message CLIENT_LIST
+#define CLIENT_LIST_SIZE 500
+// the size of the buffer for a simple tuple
+#define TUPLE_BUF_SIZE 500
 
 #endif

@@ -9,6 +9,7 @@
 List *initialize_list(void) {
     List *list = malloc(sizeof(List));
     list->head = NULL;
+    list->size = 0;
 
     return list;
 }
@@ -24,6 +25,7 @@ List_node *add_list_node(List **list, Tuple data) {
     new_node->next = (*list)->head;
     // change head pointer as new node is added at the beginning
     (*list)->head = new_node;
+    ((*list)->size)++;
 
     return new_node;
 }
@@ -36,6 +38,7 @@ int delete_list_node(List **list, Tuple data) {
     if (current != NULL && compare_tuples(current->tuple, data) == 0) {
         (*list)->head = current->next;
         free(current);
+        ((*list)->size)--;
         return 0;
     }
 
@@ -51,6 +54,7 @@ int delete_list_node(List **list, Tuple data) {
         return 1;
     }
 
+    ((*list)->size)--;
     // unlink the node from linked list
     prev->next = current->next;
     // free memory
@@ -71,6 +75,7 @@ List_node *search_list_node(List **list, Tuple data) {
 }
 
 void print_list(List *list) {
+    printf("Size %d\n", list->size);
     List_node *current = list->head;
 
     while (current != NULL) {
