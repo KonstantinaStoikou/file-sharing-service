@@ -5,16 +5,12 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include "../include/defines.h"
+#include "../include/list.h"
 #include "../include/read_functions.h"
-
-// wait for all dead child processes
-void sigchld_handler(int sig) {
-    while (waitpid(-1, NULL, WNOHANG) > 0)
-        ;
-}
+#include "../include/signal_handlers.h"
+#include "../include/tuple.h"
 
 int main(int argc, char const *argv[]) {
     int port, sock, newsock;
@@ -22,7 +18,6 @@ int main(int argc, char const *argv[]) {
     socklen_t clientlen;
     struct sockaddr *serverptr = (struct sockaddr *)&server;
     struct sockaddr *clientptr = (struct sockaddr *)&client;
-    // struct hostent *rem;
 
     read_server_arguments(argc, argv, &port);
 
@@ -61,23 +56,19 @@ int main(int argc, char const *argv[]) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
         }
-        /* Find client's address */
-        // if ((rem = gethostbyaddr((char *) &client.sin_addr.s_addr,
-        // sizeof(client.sin_addr.s_addr), client.sin_family)) == NULL) {
-        // herror("gethostbyaddr"); exit(1);}
-        // printf("Accepted connection from %s\n", rem->h_name);
         printf("Accepted connection\n");
         // create child for serving client
         pid_t pid = fork();
         // if child process
         if (pid == 0) {
             close(sock);
-            char buf[1];
-            // receive 1 char
-            while (read(newsock, buf, 1) > 0) {
-                putchar(buf[0]);
+            char buf[BUF_SIZE];
+            // read message from client
+            if (read(newsock, buf, BUF_SIZE) <= 0) {
+                perror(RED "Error reading from socket" RESET);
+                exit(EXIT_FAILURE);
             }
-            printf("Closing connection.\n");
+            printf("Client: %s\n", buf);
             // close socket
             close(newsock);
             exit(EXIT_SUCCESS);

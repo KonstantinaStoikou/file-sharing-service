@@ -5,6 +5,14 @@ NOTES:
 - reap dead children meaning?
 - binary morfi ip kai port?
 
+TERMINAL COMMANDS:
+check listening ports: sudo ss -lntu
+send message to server: echo "hello" | nc 127.0.0.1 8888
 
 MONDAY - TUESDAY:
 - finish A (dropbox server)
+    - test storing client info in list
+    - make function to parse strings (from messages)
+    - in addlistonode add node nodes that dont exist (add search in addlistnode)
+    - try sending messages to client (test from terminal only)
+    - break to smaller functions

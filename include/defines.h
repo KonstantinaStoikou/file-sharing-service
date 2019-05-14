@@ -10,4 +10,7 @@
 #define CYAN "\x1B[36m"
 #define RESET "\033[0m"
 
+// the size of the socket buffer
+#define BUF_SIZE 200
+
 #endif
