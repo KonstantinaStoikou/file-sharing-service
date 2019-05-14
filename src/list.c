@@ -1,6 +1,7 @@
 #include "../include/list.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/defines.h"
 #include "../include/tuple.h"
 
@@ -12,11 +13,15 @@ List *initialize_list(void) {
 }
 
 List_node *add_list_node(List **list, Tuple data) {
-    // Allocate memory for node
+    // check if node already exists
+    if (search_list_node(list, data) != NULL) {
+        return NULL;
+    }
+    // allocate memory for node
     List_node *new_node = (List_node *)malloc(sizeof(List_node));
     new_node->tuple = data;
     new_node->next = (*list)->head;
-    // Change head pointer as new node is added at the beginning
+    // change head pointer as new node is added at the beginning
     (*list)->head = new_node;
 
     return new_node;

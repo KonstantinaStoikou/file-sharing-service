@@ -21,7 +21,8 @@ typedef struct List {
 
 // Allocate memory for a new list struct and return it
 List *initialize_list(void);
-// Insert new node at the beginning of the list and return the newly added node
+// Insert new node at the beginning of the list and return the newly added node,
+// if node already exists return NULL
 List_node *add_list_node(List **list, Tuple data);
 // Delete a node with the given data, returns 1 if there was an error, else 0
 int delete_list_node(List **list, Tuple data);

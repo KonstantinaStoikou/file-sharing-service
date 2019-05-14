@@ -51,6 +51,9 @@ int main(int argc, char const *argv[]) {
 
     printf("Listening for connections to port %d\n", port);
 
+    // initialize list to store client info
+    List *client_list = initialize_list();
+
     while (1) {
         // accept connection
         if ((newsock = accept(sock, clientptr, &clientlen)) < 0) {
@@ -63,8 +66,9 @@ int main(int argc, char const *argv[]) {
         // if child process
         if (pid == 0) {
             close(sock);
-            handle_client_connection(newsock);
+            handle_client_connection(newsock, &client_list);
             // close socket
+            printf("Closing connection.\n");
             close(newsock);
             exit(EXIT_SUCCESS);
         }
@@ -76,6 +80,8 @@ int main(int argc, char const *argv[]) {
         // parent closes socket to client
         // must be closed before it gets re-assigned
         close(newsock);
+
+        print_list(client_list);
     }
     return 0;
 }
