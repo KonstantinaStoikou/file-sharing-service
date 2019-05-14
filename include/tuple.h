@@ -6,9 +6,11 @@
 #ifndef TUPLE_HEADER
 #define TUPLE_HEADER
 
+#include <netinet/in.h>
+
 typedef struct Tuple {
-    int ip_address;
-    int port_num;
+    struct in_addr ip_address;
+    unsigned short port_num;
 } Tuple;
 
 #endif

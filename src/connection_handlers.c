@@ -1,4 +1,5 @@
 #include "../include/connection_handlers.h"
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,8 +32,9 @@ void handle_client_connection(int sockfd, List **list) {
 
     if (strcmp(words[0], "LOG_ON") == 0) {
         printf("log\n");
-        int ip = atoi(words[1]);
-        int port = atoi(words[2]);
+        struct in_addr ip;
+        ip.s_addr = atoi(words[1]);
+        unsigned short port = atoi(words[2]);
         Tuple tup;
         tup.ip_address = ip;
         tup.port_num = port;

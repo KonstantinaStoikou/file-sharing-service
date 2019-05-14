@@ -1,4 +1,5 @@
 #include "../include/list.h"
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,7 +74,7 @@ void print_list(List *list) {
     List_node *current = list->head;
 
     while (current != NULL) {
-        printf("IP: %d, Port: %d\n", current->tuple.ip_address,
+        printf("IP: %s, Port: %d\n", inet_ntoa(current->tuple.ip_address),
                current->tuple.port_num);
         current = current->next;
     }
@@ -92,7 +93,7 @@ void delete_list(List **list) {
 }
 
 int compare_tuples(Tuple tuple1, Tuple tuple2) {
-    if (tuple1.ip_address == tuple2.ip_address &&
+    if (tuple1.ip_address.s_addr == tuple2.ip_address.s_addr &&
         tuple1.port_num == tuple2.port_num) {
         return 0;
     } else {

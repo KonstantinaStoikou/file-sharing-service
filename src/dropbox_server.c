@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -58,6 +59,8 @@ int main(int argc, char const *argv[]) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
         }
+        printf("Client: Port: %d, Address: %s\n", client.sin_port,
+               inet_ntoa(client.sin_addr));
         printf("Accepted connection\n");
 
         handle_client_connection(newsock, &client_list);
