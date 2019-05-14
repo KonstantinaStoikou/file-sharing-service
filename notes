@@ -4,6 +4,8 @@ NOTES:
 - tcp vs udp?
 - reap dead children meaning?
 - pos to trexo apo diaforetika mixanimata
+- poies ports na xrisimopoio? eipe?
+- LOG_OFF vs USER_OFF minima apo server
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
