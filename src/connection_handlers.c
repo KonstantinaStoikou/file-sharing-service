@@ -32,7 +32,6 @@ void handle_client_connection(int sockfd, List **list,
     }
 
     if (strcmp(words[0], "LOG_ON") == 0) {
-        printf("log\n");
         struct in_addr ip;
         ip.s_addr = atoi(words[1]);
         unsigned short port = atoi(words[2]);
@@ -43,7 +42,6 @@ void handle_client_connection(int sockfd, List **list,
             printf(RED "Tuple already exists.\n" RESET);
         }
     } else if (strcmp(words[0], "GET_CLIENTS") == 0) {
-        printf("get clients\n");
         struct in_addr ip;
         ip.s_addr = client.sin_addr.s_addr;
         unsigned short port = client.sin_port;
@@ -70,8 +68,12 @@ void handle_client_connection(int sockfd, List **list,
         }
 
         printf("Response %s\n", response);
+        // write response to client
+        if (write(sockfd, response, CLIENT_LIST_SIZE) < 0) {
+            perror(RED "Error writing to socket" RESET);
+            exit(EXIT_FAILURE);
+        }
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
-        printf("log off\n");
         struct in_addr ip;
         ip.s_addr = client.sin_addr.s_addr;
         unsigned short port = client.sin_port;

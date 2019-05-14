@@ -13,6 +13,3 @@ Free port numbers: 49152 - 65535
 
 MONDAY - TUESDAY:
 - finish A (dropbox server)
-    - make message CLIENT_LIST (just create the list as string)
-    - with LOG_OFF remove client from list
-    - try sending back to terminal client a message
