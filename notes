@@ -3,13 +3,12 @@ NOTES:
 - o server einai enas kai oi clients polloi?
 - tcp vs udp?
 - reap dead children meaning?
-- binary morfi ip kai port?
+- pos to trexo apo diaforetika mixanimata
 
 TERMINAL COMMANDS:
-check listening ports: sudo ss -lntu
+check listening ports:  sudo ss -lntu
 send message to server: echo "hello" | nc 127.0.0.1 8888
-
-Free port numbers: 49152 - 65535
+ree port numbers:       49152 - 65535
 
 MONDAY - TUESDAY:
 - finish A (dropbox server)
