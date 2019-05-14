@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "../include/connection_handlers.h"
 #include "../include/defines.h"
 #include "../include/list.h"
 #include "../include/read_functions.h"
@@ -62,13 +63,7 @@ int main(int argc, char const *argv[]) {
         // if child process
         if (pid == 0) {
             close(sock);
-            char buf[BUF_SIZE];
-            // read message from client
-            if (read(newsock, buf, BUF_SIZE) <= 0) {
-                perror(RED "Error reading from socket" RESET);
-                exit(EXIT_FAILURE);
-            }
-            printf("Client: %s\n", buf);
+            handle_client_connection(newsock);
             // close socket
             close(newsock);
             exit(EXIT_SUCCESS);

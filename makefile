@@ -1,4 +1,4 @@
-OBJS 	= dropbox_server.o read_functions.o list.o signal_handlers.o
+OBJS 	= dropbox_server.o read_functions.o list.o signal_handlers.o connection_handlers.o
 # OBJS 	= test.o read_functions.o list.o
 OUT  	= dropbox_server
 # OUT  	= test
@@ -22,6 +22,9 @@ list.o: src/list.c
 
 signal_handlers.o: src/signal_handlers.c
 	$(CC) $(FLAGS) src/signal_handlers.c
+
+connection_handlers.o: src/connection_handlers.c
+	$(CC) $(FLAGS) src/connection_handlers.c
 
 clean:
 	rm -f $(OBJS) $(OUT)
