@@ -22,8 +22,6 @@ int main(int argc, char const *argv[]) {
 
     read_server_arguments(argc, argv, &port);
 
-    // reap dead children asynchronously
-    signal(SIGCHLD, sigchld_handler);
     // create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror(RED "Error while creating socket" RESET);
@@ -61,27 +59,16 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
         printf("Accepted connection\n");
-        // create child for serving client
-        pid_t pid = fork();
-        // if child process
-        if (pid == 0) {
-            close(sock);
-            handle_client_connection(newsock, &client_list);
-            // close socket
-            printf("Closing connection.\n");
-            close(newsock);
-            exit(EXIT_SUCCESS);
-        }
-        // if error in fork
-        else if (pid == -1) {
-            perror(RED "Error while forking" RESET);
-            exit(EXIT_FAILURE);
-        }
-        // parent closes socket to client
-        // must be closed before it gets re-assigned
+
+        handle_client_connection(newsock, &client_list);
+        // close socket
+        printf("Closing connection.\n");
+        // sock must be closed before it gets re-assigned
         close(newsock);
 
         print_list(client_list);
     }
+
+    close(sock);
     return 0;
 }

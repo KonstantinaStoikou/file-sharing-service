@@ -19,8 +19,6 @@ void handle_client_connection(int sockfd, List **list) {
         *pos = '\0';
     }
 
-    printf("Client: %s, size %ld\n", msg, strlen(msg));
-
     // break prompt into words
     char *words[3];  // maximum number of words for a message is 3
     int count = 0;
@@ -46,7 +44,4 @@ void handle_client_connection(int sockfd, List **list) {
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
         printf("log off\n");
     }
-
-    printf("print list\n");
-    print_list(*list);
 }
