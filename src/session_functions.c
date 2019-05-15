@@ -1,3 +1,5 @@
+#include "../include/session_functions.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -16,4 +18,5 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server) {
         perror(RED "Error while connecting" RESET);
         exit(EXIT_FAILURE);
     }
+    return sock;
 }

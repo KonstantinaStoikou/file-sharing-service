@@ -30,12 +30,6 @@ int main(int argc, char const *argv[]) {
     printf("Server ip: %s\n" RESET, server_ip);
     printf("\n");
 
-    // create socket
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror(RED "Error while creating socket" RESET);
-        exit(EXIT_FAILURE);
-    }
-
     if ((rem = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
         exit(EXIT_FAILURE);
@@ -45,11 +39,7 @@ int main(int argc, char const *argv[]) {
     memcpy(&server.sin_addr, rem->h_addr, rem->h_length);
     server.sin_port = htons(server_port);
 
-    // initiate connection
-    if (connect(sock, serverptr, sizeof(server)) < 0) {
-        perror(RED "Error while connecting" RESET);
-        exit(EXIT_FAILURE);
-    }
+    sock = start_new_session(serverptr, server);
     printf("Connecting to %s port %d\n", server_ip, server_port);
 
     // retrieve this hostname
@@ -81,17 +71,8 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
     close(sock);
-    // create socket
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror(RED "Error while creating socket" RESET);
-        exit(EXIT_FAILURE);
-    }
 
-    // initiate connection
-    if (connect(sock, serverptr, sizeof(server)) < 0) {
-        perror(RED "Error while connecting" RESET);
-        exit(EXIT_FAILURE);
-    }
+    sock = start_new_session(serverptr, server);
     // empty message string
     memset(msg, 0, strlen(msg));
     strcpy(msg, "GET_CLIENTS");
