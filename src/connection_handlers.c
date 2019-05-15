@@ -1,5 +1,7 @@
 #include "../include/connection_handlers.h"
 #include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +50,6 @@ void handle_client_connection(int sockfd, List **list,
         Tuple tup;
         tup.ip_address = ip;
         tup.port_num = port;
-
         char response[CLIENT_LIST_SIZE];
         sprintf(response, "CLIENT_LIST %d ", (*list)->size);
 
@@ -84,4 +85,52 @@ void handle_client_connection(int sockfd, List **list,
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
     }
+}
+
+void send_logon_msg(int sock, int port) {
+    // retrieve this hostname
+    char hostbuf[BUF_SIZE];
+    if (gethostname(hostbuf, sizeof(hostbuf)) < 0) {
+        perror(RED "Error in gethostname" RESET);
+        exit(EXIT_FAILURE);
+    }
+
+    // retrieve this host's information
+    struct hostent *rem_client;
+    if ((rem_client = gethostbyname(hostbuf)) == NULL) {
+        herror(RED "Error in gethostbyname" RESET);
+        exit(EXIT_FAILURE);
+    }
+    struct sockaddr_in client;
+    client.sin_addr.s_addr = htonl(*rem_client->h_addr);
+    client.sin_port = htons(port);
+
+    printf("Client: Port: %d, Address: %s\n", client.sin_port,
+           inet_ntoa(client.sin_addr));
+
+    // inform server that this new client has arrived
+    char msg[BUF_SIZE];
+    sprintf(msg, "LOG_ON %d %d", client.sin_addr.s_addr, client.sin_port);
+    if (write(sock, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void send_getclients_msg(int sock) {
+    // empty message string
+    char msg[BUF_SIZE];
+    strcpy(msg, "GET_CLIENTS");
+    if (write(sock, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+    char buf[CLIENT_LIST_SIZE];
+    // read message from client
+    if (read(sock, buf, CLIENT_LIST_SIZE) < 0) {
+        perror(RED "Error reading from socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Received string: %s", buf);
 }

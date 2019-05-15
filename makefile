@@ -1,4 +1,4 @@
-OBJS 	= read_functions.o list.o signal_handlers.o connection_handlers.o session_functions.o
+OBJS 	= read_functions.o list.o connection_handlers.o session_functions.o
 OUT  	= dropbox_server dropbox_client test
 CC		= gcc
 FLAGS   = -Wall -g -c 
@@ -22,9 +22,6 @@ read_functions.o: src/read_functions.c
 
 list.o: src/list.c
 	$(CC) $(FLAGS) src/list.c
-
-signal_handlers.o: src/signal_handlers.c
-	$(CC) $(FLAGS) src/signal_handlers.c
 
 connection_handlers.o: src/connection_handlers.c
 	$(CC) $(FLAGS) src/connection_handlers.c
