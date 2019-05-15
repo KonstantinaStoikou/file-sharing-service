@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "../include/defines.h"
 #include "../include/read_functions.h"
+#include "../include/session_functions.h"
 
 int main(int argc, char const *argv[]) {
     char *dirname;
@@ -21,12 +22,12 @@ int main(int argc, char const *argv[]) {
     read_client_arguments(argc, argv, &dirname, &port, &worker_threads_num,
                           &bufsize, &server_port, &server_ip);
 
-    printf("Dirname: %s\n", dirname);
+    printf(BLUE "Dirname: %s\n", dirname);
     printf("Port num: %d\n", port);
     printf("Worker threads: %d\n", worker_threads_num);
     printf("Buffer size: %d\n", bufsize);
     printf("Server port: %d\n", server_port);
-    printf("Server ip: %s\n", server_ip);
+    printf("Server ip: %s\n" RESET, server_ip);
     printf("\n");
 
     // create socket
@@ -79,9 +80,28 @@ int main(int argc, char const *argv[]) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
-    char buf[BUF_SIZE];
+    close(sock);
+    // create socket
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror(RED "Error while creating socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+
+    // initiate connection
+    if (connect(sock, serverptr, sizeof(server)) < 0) {
+        perror(RED "Error while connecting" RESET);
+        exit(EXIT_FAILURE);
+    }
+    // empty message string
+    memset(msg, 0, strlen(msg));
+    strcpy(msg, "GET_CLIENTS");
+    if (write(sock, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+    char buf[CLIENT_LIST_SIZE];
     // read message from client
-    if (read(sock, buf, BUF_SIZE) < 0) {
+    if (read(sock, buf, CLIENT_LIST_SIZE) < 0) {
         perror(RED "Error reading from socket" RESET);
         exit(EXIT_FAILURE);
     }

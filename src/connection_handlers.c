@@ -11,7 +11,7 @@ void handle_client_connection(int sockfd, List **list,
                               struct sockaddr_in client) {
     char msg[BUF_SIZE];
     // read message from client
-    if (read(sockfd, msg, BUF_SIZE) <= 0) {
+    if (read(sockfd, msg, BUF_SIZE) < 0) {
         perror(RED "Error reading from socket" RESET);
         exit(EXIT_FAILURE);
     }
