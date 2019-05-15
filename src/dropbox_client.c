@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -26,6 +27,7 @@ int main(int argc, char const *argv[]) {
     printf("Buffer size: %d\n", bufsize);
     printf("Server port: %d\n", server_port);
     printf("Server ip: %s\n", server_ip);
+    printf("\n");
 
     // create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -48,15 +50,38 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
     printf("Connecting to %s port %d\n", server_ip, server_port);
-    char buf[BUF_SIZE];
 
-    // write response to client
-    if (write(sock, "GET_CLIENTS", strlen("GET_CLIENTS") + 1) < 0) {
+    // retrieve this hostname
+    char hostbuf[BUF_SIZE];
+    if (gethostname(hostbuf, sizeof(hostbuf)) < 0) {
+        perror(RED "Error in gethostname" RESET);
+        exit(EXIT_FAILURE);
+    }
+
+    // retrieve this host's information
+    struct hostent *rem_client;
+    if ((rem_client = gethostbyname(hostbuf)) == NULL) {
+        herror(RED "Error in gethostbyname" RESET);
+        exit(EXIT_FAILURE);
+    }
+    struct sockaddr_in client;
+    // memcpy(&client.sin_addr, rem_client->h_addr, rem_client->h_length);
+    client.sin_addr.s_addr = htonl(*rem_client->h_addr);
+    client.sin_port = htons(port);
+
+    printf("Client: Port: %d, Address: %s\n", client.sin_port,
+           inet_ntoa(client.sin_addr));
+
+    // inform server that this new client has arrived
+    char msg[BUF_SIZE];
+    sprintf(msg, "LOG_ON %d %d", client.sin_addr.s_addr, client.sin_port);
+    if (write(sock, msg, BUF_SIZE) < 0) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
+    char buf[BUF_SIZE];
     // read message from client
-    if (read(sock, buf, BUF_SIZE) <= 0) {
+    if (read(sock, buf, BUF_SIZE) < 0) {
         perror(RED "Error reading from socket" RESET);
         exit(EXIT_FAILURE);
     }
