@@ -23,10 +23,10 @@ void handle_client_connection(int sockfd, List **list,
         *pos = '\0';
     }
 
-    // break prompt into words
+    // break message into words
     char *words[3];  // maximum number of words for a message is 3
     int count = 0;
-    char *word = strtok(msg, " ");  // split prompt by spaces
+    char *word = strtok(msg, " ");  // split message by spaces
     while (word) {
         words[count] = word;
         count++;
@@ -54,7 +54,7 @@ void handle_client_connection(int sockfd, List **list,
         sprintf(response, "CLIENT_LIST %d ", (*list)->size);
 
         // construct message to send to client
-        // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
+        // message format: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
         List_node *current = (*list)->head;
 
         while (current != NULL) {
@@ -87,24 +87,7 @@ void handle_client_connection(int sockfd, List **list,
     }
 }
 
-void send_logon_msg(int sock, int port) {
-    // retrieve this hostname
-    char hostbuf[BUF_SIZE];
-    if (gethostname(hostbuf, sizeof(hostbuf)) < 0) {
-        perror(RED "Error in gethostname" RESET);
-        exit(EXIT_FAILURE);
-    }
-
-    // retrieve this host's information
-    struct hostent *rem_client;
-    if ((rem_client = gethostbyname(hostbuf)) == NULL) {
-        herror(RED "Error in gethostbyname" RESET);
-        exit(EXIT_FAILURE);
-    }
-    struct sockaddr_in client;
-    client.sin_addr.s_addr = htonl(*rem_client->h_addr);
-    client.sin_port = htons(port);
-
+void send_logon_msg(int sock, int port, struct sockaddr_in client) {
     printf("Client: Port: %d, Address: %s\n", client.sin_port,
            inet_ntoa(client.sin_addr));
 
@@ -117,7 +100,7 @@ void send_logon_msg(int sock, int port) {
     }
 }
 
-void send_getclients_msg(int sock) {
+char *send_getclients_msg(int sock) {
     // empty message string
     char msg[BUF_SIZE];
     strcpy(msg, "GET_CLIENTS");
@@ -125,12 +108,43 @@ void send_getclients_msg(int sock) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
-    char buf[CLIENT_LIST_SIZE];
+    char *buf = malloc(CLIENT_LIST_SIZE);
     // read message from client
     if (read(sock, buf, CLIENT_LIST_SIZE) < 0) {
         perror(RED "Error reading from socket" RESET);
         exit(EXIT_FAILURE);
     }
 
-    printf("Received string: %s", buf);
+    return buf;
+}
+
+void parse_client_list(char *str, List **list) {
+    // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
+    // break message into words
+    char *word = strtok(str, " ");  // split first two words of message
+    for (int i = 0; i < 2; i++) {
+        word = strtok(NULL, " ");
+    }
+    // split remaining sentence to words which represend tuples
+    while (word) {
+        // split (by comma) each tuple to ip address and port
+        char *token = strtok(word, ",");
+        struct in_addr ip;
+        unsigned short port;
+        for (int i = 0; i < 2; i++) {
+            if (i == 0) {
+                ip.s_addr = atoi(token);
+            } else {
+                port = atoi(token);
+            }
+            token = strtok(NULL, " ");
+        }
+        Tuple tup;
+        tup.ip_address = ip;
+        tup.port_num = port;
+        if (add_list_node(list, tup) == NULL) {
+            printf(RED "Tuple already exists.\n" RESET);
+        }
+        word = strtok(NULL, " ");
+    }
 }

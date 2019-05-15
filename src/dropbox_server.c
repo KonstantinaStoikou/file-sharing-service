@@ -11,7 +11,6 @@
 #include "../include/defines.h"
 #include "../include/list.h"
 #include "../include/read_functions.h"
-#include "../include/signal_handlers.h"
 #include "../include/tuple.h"
 
 int main(int argc, char const *argv[]) {
@@ -31,7 +30,7 @@ int main(int argc, char const *argv[]) {
     // override fails in bind
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) <
         0) {
-        perror(RED "setsockopt(SO_REUSEADDR) failed" RESET);
+        perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
     }
 
     server.sin_family = AF_INET;  // internet domain
@@ -64,8 +63,9 @@ int main(int argc, char const *argv[]) {
         printf("Accepted connection\n");
 
         handle_client_connection(newsock, &client_list, client);
-        // close socket
+
         printf("Closing connection.\n");
+        // close socket
         // sock must be closed before it gets re-assigned
         close(newsock);
 

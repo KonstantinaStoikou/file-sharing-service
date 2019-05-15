@@ -1,16 +1,10 @@
 NOTES:
 
-- o server einai enas kai oi clients polloi?
-- tcp vs udp?
-- reap dead children meaning?
-- pos to trexo apo diaforetika mixanimata
-- poies ports na xrisimopoio? eipe?
 - LOG_OFF vs USER_OFF minima apo server
-- thelei shared memory?
-- to main thread einai i main sinartisi?
 - to server ip pos dinetai san orisma? string int??
-- pos kleinoume kai ksananoigoume to session?
 - port client san orisma kai port client pou vrisketai genika?
+
+- maybe split handle server connection to smaller functions
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu

@@ -6,5 +6,9 @@
 // Start a new session with a server by creating socket and connecting to it,
 // return socket's file descriptor
 int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server);
+// Create socket for client and start listen to this port, return listening
+// socket's file descriptor
+int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
+                         int port);
 
 #endif
