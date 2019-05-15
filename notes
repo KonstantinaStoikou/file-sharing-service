@@ -6,11 +6,16 @@ NOTES:
 - pos to trexo apo diaforetika mixanimata
 - poies ports na xrisimopoio? eipe?
 - LOG_OFF vs USER_OFF minima apo server
+- thelei shared memory?
+- to main thread einai i main sinartisi?
+- to server ip pos dinetai san orisma? string int??
+
+- to signal handler den xreiazetai mexris stigmis
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
 send message to server: echo "hello" | nc 127.0.0.1 8888
-ree port numbers:       49152 - 65535
+free port numbers:      49152 - 65535
 
-MONDAY - TUESDAY:
-- finish A (dropbox server)
+TO DO:
+- client main thread 

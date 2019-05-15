@@ -33,8 +33,8 @@ int main(int argc, char const *argv[]) {
         0) {
         perror(RED "setsockopt(SO_REUSEADDR) failed" RESET);
     }
-    // internet domain
-    server.sin_family = AF_INET;
+
+    server.sin_family = AF_INET;  // internet domain
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(port);
     // bind socket to address
