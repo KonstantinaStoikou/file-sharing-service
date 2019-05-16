@@ -47,8 +47,6 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Listening for connections to port %d\n", port);
-
     // initialize list to store client info
     List *client_list = initialize_list();
 

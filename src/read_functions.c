@@ -1,6 +1,9 @@
 #include "../include/read_functions.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include "../include/defines.h"
 
 void read_server_arguments(int argc, char const *argv[], int *port_num) {
     for (int i = 1; i < argc; i++) {
@@ -29,5 +32,18 @@ void read_client_arguments(int argc, char const *argv[], char **dirname,
             *server_ip = malloc(strlen(argv[i + 1]) + 1);
             strcpy(*server_ip, argv[i + 1]);
         }
+    }
+}
+
+void read_message_from_socket(int sockfd, char *msg, int size) {
+    // read message from socket
+    if (read(sockfd, msg, size) < 0) {
+        perror(RED "Error reading from socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+    // remove '\n' if it exists inside the message
+    char *pos;
+    if ((pos = strchr(msg, '\n')) != NULL) {
+        *pos = '\0';
     }
 }

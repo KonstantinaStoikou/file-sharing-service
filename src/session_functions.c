@@ -70,7 +70,5 @@ int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
         exit(EXIT_FAILURE);
     }
 
-    printf("Listening for connections to port %d\n", port);
-
     return listen_sock;
 }

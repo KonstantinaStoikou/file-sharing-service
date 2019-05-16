@@ -7,21 +7,14 @@
 #include <string.h>
 #include <unistd.h>
 #include "../include/defines.h"
+#include "../include/read_functions.h"
 #include "../include/tuple.h"
 
 void handle_client_connection(int sockfd, List **list,
                               struct sockaddr_in client) {
     char msg[BUF_SIZE];
     // read message from client
-    if (read(sockfd, msg, BUF_SIZE) < 0) {
-        perror(RED "Error reading from socket" RESET);
-        exit(EXIT_FAILURE);
-    }
-    // remove '\n' if it exists inside the message
-    char *pos;
-    if ((pos = strchr(msg, '\n')) != NULL) {
-        *pos = '\0';
-    }
+    read_message_from_socket(sockfd, msg, BUF_SIZE);
 
     // break message into words
     char *words[3];  // maximum number of words for a message is 3
@@ -35,7 +28,8 @@ void handle_client_connection(int sockfd, List **list,
 
     if (strcmp(words[0], "LOG_ON") == 0) {
         struct in_addr ip;
-        ip.s_addr = atoi(words[1]);
+        int ip32 = atoi(words[1]);
+        ip = *(struct in_addr *)&ip32;
         unsigned short port = atoi(words[2]);
         Tuple tup;
         tup.ip_address = ip;
@@ -46,25 +40,15 @@ void handle_client_connection(int sockfd, List **list,
 
         // empty message string
         memset(msg, 0, strlen(msg));
-        // read message from client (client will ask for client list immediately
-        // after sending LOG_ON)
-        if (read(sockfd, msg, BUF_SIZE) < 0) {
-            perror(RED "Error reading from socket" RESET);
-            exit(EXIT_FAILURE);
-        }
-
-        // remove '\n' if it exists inside the message
-        char *pos;
-        if ((pos = strchr(msg, '\n')) != NULL) {
-            *pos = '\0';
-        }
+        // read message from client (client will ask for client list
+        read_message_from_socket(sockfd, msg, BUF_SIZE);
 
         if (strcmp(msg, "GET_CLIENTS") == 0) {
             send_client_list(list, tup, sockfd);
         }
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
         struct in_addr ip;
-        ip.s_addr = client.sin_addr.s_addr;
+        ip = client.sin_addr;
         unsigned short port = client.sin_port;
         Tuple tup;
         tup.ip_address = ip;
@@ -76,8 +60,8 @@ void handle_client_connection(int sockfd, List **list,
 }
 
 void send_logon_msg(int sockfd, int port, struct sockaddr_in client) {
-    printf("Client: Port: %d, Address: %s\n", client.sin_port,
-           inet_ntoa(client.sin_addr));
+    printf("Client: Port: %d, Address: %d\n", client.sin_port,
+           client.sin_addr.s_addr);
 
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
@@ -121,7 +105,8 @@ void parse_client_list(char *str, List **list) {
         unsigned short port;
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
-                ip.s_addr = atoi(token);
+                int ip32 = atoi(token);
+                ip = *(struct in_addr *)&ip32;
             } else {
                 port = atoi(token);
             }
@@ -139,7 +124,9 @@ void parse_client_list(char *str, List **list) {
 
 void send_client_list(List **list, Tuple tup, int sockfd) {
     char response[CLIENT_LIST_SIZE];
-    sprintf(response, "CLIENT_LIST %d ", (*list)->size);
+    // size of passing list will be minus 1 because this client is not included
+    int size = (*list)->size - 1;
+    sprintf(response, "CLIENT_LIST %d ", size);
 
     // construct message to send to client
     // message format: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
@@ -155,8 +142,6 @@ void send_client_list(List **list, Tuple tup, int sockfd) {
         }
         current = current->next;
     }
-
-    printf("Response %s\n", response);
 
     // write response to client
     if (write(sockfd, response, CLIENT_LIST_SIZE) < 0) {

@@ -79,7 +79,7 @@ void print_list(List *list) {
     List_node *current = list->head;
 
     while (current != NULL) {
-        printf("IP: %s, Port: %d\n", inet_ntoa(current->tuple.ip_address),
+        printf("IP: %d, Port: %d\n", current->tuple.ip_address.s_addr,
                current->tuple.port_num);
         current = current->next;
     }

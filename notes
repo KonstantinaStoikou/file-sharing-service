@@ -11,6 +11,3 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
-- client main thread (first paragraph)
-    - getclients don't send same client
-    - na dokimaso na valo to getclients mesa sto if tou logon
