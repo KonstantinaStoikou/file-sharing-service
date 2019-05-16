@@ -11,6 +11,7 @@
 #include "../include/defines.h"
 #include "../include/list.h"
 #include "../include/read_functions.h"
+#include "../include/session_functions.h"
 #include "../include/tuple.h"
 
 int main(int argc, char const *argv[]) {
@@ -22,30 +23,7 @@ int main(int argc, char const *argv[]) {
 
     read_server_arguments(argc, argv, &port);
 
-    // create socket
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror(RED "Error while creating socket" RESET);
-        exit(EXIT_FAILURE);
-    }
-    // override fails in bind
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) <
-        0) {
-        perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
-    }
-
-    server.sin_family = AF_INET;  // internet domain
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    server.sin_port = htons(port);
-    // bind socket to address
-    if (bind(sock, serverptr, sizeof(server)) < 0) {
-        perror(RED "Error while binding socket to address" RESET);
-        exit(EXIT_FAILURE);
-    }
-    // listen for connections
-    if (listen(sock, 5) < 0) {
-        perror(RED "Error while listening for connections" RESET);
-        exit(EXIT_FAILURE);
-    }
+    sock = start_listening_port(serverptr, &server, port);
 
     // initialize list to store client info
     List *client_list = initialize_list();

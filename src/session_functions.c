@@ -26,11 +26,11 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server) {
     return sock;
 }
 
-int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
+int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in *server,
                          int port) {
     int listen_sock;
 
-    // create socket that this client will listen to
+    // create socket that this server will listen to
     if ((listen_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror(RED "Error while creating socket" RESET);
         exit(EXIT_FAILURE);
@@ -41,12 +41,12 @@ int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
         perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
     }
 
-    client->sin_family = AF_INET;  // internet domain
-    client->sin_addr.s_addr = htonl(INADDR_ANY);
-    client->sin_port = htons(port);
+    server->sin_family = AF_INET;  // internet domain
+    server->sin_addr.s_addr = htonl(INADDR_ANY);
+    server->sin_port = htons(port);
 
     // bind socket to address
-    if (bind(listen_sock, clientptr, sizeof(*client)) < 0) {
+    if (bind(listen_sock, serverptr, sizeof(*server)) < 0) {
         perror(RED "Error while binding socket to address" RESET);
         exit(EXIT_FAILURE);
     }

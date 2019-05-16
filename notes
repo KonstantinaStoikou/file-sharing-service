@@ -15,5 +15,4 @@ free port numbers:      49152 - 65535
 TO DO:
     - complete second paragraph in client
         - start worker threads
-        - break function startsession to initialize client struct and open port fuctions
         - see select() function
