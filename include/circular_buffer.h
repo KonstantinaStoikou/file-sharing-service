@@ -21,8 +21,8 @@ typedef struct Circular_buffer {
 typedef struct Cb_data {
     char pathname[128];
     int version;
-    // struct in_addr ip_address;
-    // unsigned short port_num;
+    struct in_addr ip_address;
+    unsigned short port_num;
 } Cb_data;
 
 // Allocate memory for a new circular buffer struct and return it

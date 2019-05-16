@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "../include/circular_buffer.h"
 #include "../include/connection_handlers.h"
 #include "../include/defines.h"
 #include "../include/list.h"
@@ -25,6 +26,9 @@ int main(int argc, char const *argv[]) {
     read_client_arguments(argc, argv, &dirname, &port, &worker_threads_num,
                           &bufsize, &server_port, &server_ip);
 
+    // get clients ip address
+    struct in_addr client_ip = get_client_info();
+
     listen_sock = start_listening_port(clientptr, &client, port);
 
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
@@ -39,7 +43,7 @@ int main(int argc, char const *argv[]) {
     // start new session with server and send LOG_ON message with this client's
     // info
     sock = start_new_session(serverptr, server);
-    send_logon_msg(sock, port, client);
+    send_logon_msg(sock, port, client_ip, client);
 
     // initialize list to store other clients' info
     List *client_list = initialize_list();
@@ -49,6 +53,9 @@ int main(int argc, char const *argv[]) {
     parse_client_list(client_list_msg, &client_list);
     free(client_list_msg);
     close(sock);
+
+    // initialize citcular buffer
+    Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
     print_list(client_list);
 

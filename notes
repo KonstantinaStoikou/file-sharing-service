@@ -3,6 +3,7 @@ NOTES:
 - LOG_OFF vs USER_OFF minima apo server
 - to buffer exei strings i structs?
 - maybe list can be passed with single pointer to list functions
+- ntohl/s?
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -13,8 +14,6 @@ free port numbers:      49152 - 65535
 
 TO DO:
     - complete second paragraph in client
-        - create circular buffer
-        - test circular buffer
         - start worker threads
         - break function startsession to initialize client struct and open port fuctions
         - see select() function

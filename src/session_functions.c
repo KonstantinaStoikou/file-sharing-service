@@ -29,7 +29,6 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server) {
 int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
                          int port) {
     int listen_sock;
-    struct hostent *rem_client;
 
     // create socket that this client will listen to
     if ((listen_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -42,21 +41,8 @@ int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
         perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
     }
 
-    // retrieve this hostname
-    char hostbuf[BUF_SIZE];
-    if (gethostname(hostbuf, sizeof(hostbuf)) < 0) {
-        perror(RED "Error in gethostname" RESET);
-        exit(EXIT_FAILURE);
-    }
-
-    // retrieve this host's information
-    if ((rem_client = gethostbyname(hostbuf)) == NULL) {
-        herror(RED "Error in gethostbyname" RESET);
-        exit(EXIT_FAILURE);
-    }
-
     client->sin_family = AF_INET;  // internet domain
-    client->sin_addr.s_addr = htonl(*rem_client->h_addr);
+    client->sin_addr.s_addr = htonl(INADDR_ANY);
     client->sin_port = htons(port);
 
     // bind socket to address
@@ -71,4 +57,24 @@ int start_listening_port(struct sockaddr *clientptr, struct sockaddr_in *client,
     }
 
     return listen_sock;
+}
+
+struct in_addr get_client_info() {
+    struct hostent *rem_client;
+
+    // retrieve this client's hostname
+    char hostbuf[BUF_SIZE];
+    if (gethostname(hostbuf, sizeof(hostbuf)) < 0) {
+        perror(RED "Error in gethostname" RESET);
+        exit(EXIT_FAILURE);
+    }
+
+    // retrieve this client's host information
+    if ((rem_client = gethostbyname(hostbuf)) == NULL) {
+        herror(RED "Error in gethostbyname" RESET);
+        exit(EXIT_FAILURE);
+    }
+    struct in_addr client_addr;
+    client_addr.s_addr = htonl(*rem_client->h_addr);
+    return client_addr;
 }

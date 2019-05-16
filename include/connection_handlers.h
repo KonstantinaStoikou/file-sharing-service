@@ -8,7 +8,8 @@
 void handle_client_connection(int sockfd, List** list,
                               struct sockaddr_in server);
 // Send a LOG_ON message to server
-void send_logon_msg(int sockfd, int port, struct sockaddr_in client);
+void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
+                    struct sockaddr_in client);
 // Send a GET_CLIENTS message to server and get response and return the response
 // string
 char* send_getclients_msg(int sockfd);

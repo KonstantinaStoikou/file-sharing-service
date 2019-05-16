@@ -59,13 +59,14 @@ void handle_client_connection(int sockfd, List **list,
     }
 }
 
-void send_logon_msg(int sockfd, int port, struct sockaddr_in client) {
+void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
+                    struct sockaddr_in client) {
     printf("Client: Port: %d, Address: %s\n", client.sin_port,
-           inet_ntoa(client.sin_addr));
+           inet_ntoa(client_ip));
 
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
-    sprintf(msg, "LOG_ON %d %d", client.sin_addr.s_addr, client.sin_port);
+    sprintf(msg, "LOG_ON %d %d", client_ip.s_addr, client.sin_port);
     if (write(sockfd, msg, BUF_SIZE) < 0) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
@@ -136,7 +137,7 @@ void send_client_list(List **list, Tuple tup, int sockfd) {
         // add to message only tuples different that this client's
         if (compare_tuples(current->tuple, tup) == 1) {
             char temp[TUPLE_BUF_SIZE];
-            sprintf(temp, "%s,%d ", inet_ntoa(current->tuple.ip_address),
+            sprintf(temp, "%d,%d ", current->tuple.ip_address.s_addr,
                     current->tuple.port_num);
             strcat(response, temp);
         }
@@ -148,4 +149,5 @@ void send_client_list(List **list, Tuple tup, int sockfd) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
+    printf("Res: %s\n", response);
 }
