@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,9 +15,14 @@
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
 
+void *do_nothing(void *arg) {
+    printf("thread %ld\n", pthread_self());
+    pthread_exit(NULL);
+}
+
 int main(int argc, char const *argv[]) {
     char *dirname;
-    int port, worker_threads_num, bufsize, server_port, sock, listen_sock;
+    int port, worker_threads_num, bufsize, server_port;
     char *server_ip;
     struct sockaddr_in server, client;
     struct sockaddr *serverptr = (struct sockaddr *)&server;
@@ -29,8 +35,6 @@ int main(int argc, char const *argv[]) {
     // get clients ip address
     struct in_addr client_ip = get_client_info();
 
-    listen_sock = start_listening_port(clientptr, &client, port);
-
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
         exit(EXIT_FAILURE);
@@ -42,7 +46,7 @@ int main(int argc, char const *argv[]) {
 
     // start new session with server and send LOG_ON message with this client's
     // info
-    sock = start_new_session(serverptr, server);
+    int sock = start_new_session(serverptr, server);
     send_logon_msg(sock, port, client_ip, client);
 
     // initialize list to store other clients' info
@@ -58,6 +62,19 @@ int main(int argc, char const *argv[]) {
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
     print_list(client_list);
+
+    // start listening for requests from other clients or the server
+    int listen_sock = start_listening_port(clientptr, &client, port);
+
+    // create worker threads
+    pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
+
+    for (int i = 0; i < worker_threads_num; i++) {
+        if (pthread_create(&t_ids[i], NULL, do_nothing, NULL) != 0) {
+            perror(RED "Error while creating threads");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     return 0;
 }

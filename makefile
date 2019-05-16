@@ -5,7 +5,7 @@ FLAGS   = -Wall -g -c
 
 all: $(OBJS) dropbox_client.o dropbox_server.o test.o
 	$(CC) -g $(OBJS) dropbox_server.o -o dropbox_server
-	$(CC) -g $(OBJS) dropbox_client.o -o dropbox_client
+	$(CC) -g -pthread $(OBJS) dropbox_client.o -o dropbox_client
 	$(CC) -g $(OBJS) test.o -o test
 
 test.o: test.c
@@ -15,7 +15,7 @@ dropbox_server.o: src/dropbox_server.c
 	$(CC) $(FLAGS) src/dropbox_server.c
 
 dropbox_client.o: src/dropbox_client.c
-	$(CC) $(FLAGS) src/dropbox_client.c
+	$(CC) $(FLAGS) -lpthread src/dropbox_client.c
 
 read_functions.o: src/read_functions.c
 	$(CC) $(FLAGS) src/read_functions.c

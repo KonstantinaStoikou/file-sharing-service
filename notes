@@ -3,6 +3,7 @@ NOTES:
 - LOG_OFF vs USER_OFF minima apo server
 - to buffer exei strings i structs?
 - ntohl/s?
+- client has ip address 127.0.0.1 -> loopback address can't be used in other computers
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -12,6 +13,6 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
-    - complete second paragraph in client
-        - start worker threads
-        - see select() function
+- complete second paragraph in client
+    - start worker threads
+    - see select() function
