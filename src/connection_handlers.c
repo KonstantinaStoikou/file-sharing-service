@@ -60,8 +60,8 @@ void handle_client_connection(int sockfd, List **list,
 }
 
 void send_logon_msg(int sockfd, int port, struct sockaddr_in client) {
-    printf("Client: Port: %d, Address: %d\n", client.sin_port,
-           client.sin_addr.s_addr);
+    printf("Client: Port: %d, Address: %s\n", client.sin_port,
+           inet_ntoa(client.sin_addr));
 
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
