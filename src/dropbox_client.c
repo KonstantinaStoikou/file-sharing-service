@@ -41,13 +41,10 @@ int main(int argc, char const *argv[]) {
     sock = start_new_session(serverptr, server);
     printf("Connecting to %s port %d\n", server_ip, server_port);
     send_logon_msg(sock, port, client);
-    close(sock);
 
     // initialize list to store other clients' info
     List *client_list = initialize_list();
 
-    // start new session with server and ask for client list
-    sock = start_new_session(serverptr, server);
     char *client_list_msg = send_getclients_msg(sock);
     printf("Client list: %s\n", client_list_msg);
     // parse client list string

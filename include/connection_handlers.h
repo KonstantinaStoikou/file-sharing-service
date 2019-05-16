@@ -8,11 +8,13 @@
 void handle_client_connection(int sockfd, List** list,
                               struct sockaddr_in server);
 // Send a LOG_ON message to server
-void send_logon_msg(int sock, int port, struct sockaddr_in client);
+void send_logon_msg(int sockfd, int port, struct sockaddr_in client);
 // Send a GET_CLIENTS message to server and get response and return the response
 // string
-char* send_getclients_msg(int sock);
+char* send_getclients_msg(int sockfd);
 // Parse string with client list entries and store them to the list struct
 void parse_client_list(char* str, List** list);
+// Create a string with client tuples and send it to client who made request
+void send_client_list(List** list, Tuple tup, int sockfd);
 
 #endif

@@ -1,9 +1,6 @@
 NOTES:
 
 - LOG_OFF vs USER_OFF minima apo server
-- to server ip pos dinetai san orisma? string int??
-- port client san orisma kai port client pou vrisketai genika?
-
 - maybe split handle server connection to smaller functions
 
 TERMINAL COMMANDS:
@@ -16,4 +13,4 @@ free port numbers:      49152 - 65535
 TO DO:
 - client main thread (first paragraph)
     - getclients don't send same client
-    - parse client list message and add to list struct
+    - na dokimaso na valo to getclients mesa sto if tou logon
