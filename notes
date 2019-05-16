@@ -2,7 +2,6 @@ NOTES:
 
 - LOG_OFF vs USER_OFF minima apo server
 - to buffer exei strings i structs?
-- maybe list can be passed with single pointer to list functions
 - ntohl/s?
 
 TERMINAL COMMANDS:

@@ -36,11 +36,8 @@ int main(int argc, char const *argv[]) {
         }
         printf("Client: Port: %d, Address: %s\n", client.sin_port,
                inet_ntoa(client.sin_addr));
-        printf("Accepted connection\n");
 
         handle_client_connection(newsock, client_list, client);
-
-        printf("Closing connection.\n");
         // close socket
         // sock must be closed before it gets re-assigned
         close(newsock);
