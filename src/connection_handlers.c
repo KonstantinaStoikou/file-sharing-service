@@ -10,7 +10,7 @@
 #include "../include/read_functions.h"
 #include "../include/tuple.h"
 
-void handle_client_connection(int sockfd, List **list,
+void handle_client_connection(int sockfd, List *list,
                               struct sockaddr_in client) {
     char msg[BUF_SIZE];
     // read message from client
@@ -91,47 +91,52 @@ char *send_getclients_msg(int sockfd) {
     return buf;
 }
 
-void parse_client_list(char *str, List **list) {
+void parse_client_list(char *str, List *list) {
+    printf("msg: %s\n", str);
     // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
     // break message into words
-    char *word = strtok(str, " ");  // split first two words of message
-    for (int i = 0; i < 2; i++) {
-        word = strtok(NULL, " ");
-    }
+    int count = 0;
+    char *saveptr_str;
+    char *word = strtok_r(str, " ", &saveptr_str);
     // split remaining sentence to words which represend tuples
     while (word) {
-        // split (by comma) each tuple to ip address and port
-        char *token = strtok(word, ",");
-        struct in_addr ip;
-        unsigned short port;
-        for (int i = 0; i < 2; i++) {
-            if (i == 0) {
-                int ip32 = atoi(token);
-                ip = *(struct in_addr *)&ip32;
-            } else {
-                port = atoi(token);
+        // if this is not first or second word (CLIENT_LIST or N)
+        if (count != 0 && count != 1) {
+            // split (by comma) each tuple to ip address and port
+            char *saveptr_word;
+            char *token = strtok_r(word, ",", &saveptr_word);
+            struct in_addr ip;
+            unsigned short port;
+            for (int i = 0; i < 2; i++) {
+                if (i == 0) {
+                    int ip32 = atoi(token);
+                    ip = *(struct in_addr *)&ip32;
+                } else {
+                    port = atoi(token);
+                }
+                token = strtok_r(NULL, ",", &saveptr_word);
             }
-            token = strtok(NULL, " ");
+            Tuple tup;
+            tup.ip_address = ip;
+            tup.port_num = port;
+            if (add_list_node(list, tup) == NULL) {
+                printf(RED "Tuple already exists.\n" RESET);
+            }
         }
-        Tuple tup;
-        tup.ip_address = ip;
-        tup.port_num = port;
-        if (add_list_node(list, tup) == NULL) {
-            printf(RED "Tuple already exists.\n" RESET);
-        }
-        word = strtok(NULL, " ");
+        count++;
+        word = strtok_r(NULL, " ", &saveptr_str);
     }
 }
 
-void send_client_list(List **list, Tuple tup, int sockfd) {
+void send_client_list(List *list, Tuple tup, int sockfd) {
     char response[CLIENT_LIST_SIZE];
     // size of passing list will be minus 1 because this client is not included
-    int size = (*list)->size - 1;
+    int size = list->size - 1;
     sprintf(response, "CLIENT_LIST %d ", size);
 
     // construct message to send to client
     // message format: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
-    List_node *current = (*list)->head;
+    List_node *current = list->head;
 
     while (current != NULL) {
         // add to message only tuples different that this client's

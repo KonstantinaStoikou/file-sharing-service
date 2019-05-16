@@ -14,7 +14,7 @@ List *initialize_list(void) {
     return list;
 }
 
-List_node *add_list_node(List **list, Tuple data) {
+List_node *add_list_node(List *list, Tuple data) {
     // check if node already exists
     if (search_list_node(list, data) != NULL) {
         return NULL;
@@ -22,23 +22,23 @@ List_node *add_list_node(List **list, Tuple data) {
     // allocate memory for node
     List_node *new_node = (List_node *)malloc(sizeof(List_node));
     new_node->tuple = data;
-    new_node->next = (*list)->head;
+    new_node->next = list->head;
     // change head pointer as new node is added at the beginning
-    (*list)->head = new_node;
-    ((*list)->size)++;
+    list->head = new_node;
+    (list->size)++;
 
     return new_node;
 }
 
-int delete_list_node(List **list, Tuple data) {
+int delete_list_node(List *list, Tuple data) {
     // store head node
-    List_node *current = (*list)->head, *prev;
+    List_node *current = list->head, *prev;
 
     // check if node to be deleted is the head
     if (current != NULL && compare_tuples(current->tuple, data) == 0) {
-        (*list)->head = current->next;
+        list->head = current->next;
         free(current);
-        ((*list)->size)--;
+        (list->size)--;
         return 0;
     }
 
@@ -54,7 +54,7 @@ int delete_list_node(List **list, Tuple data) {
         return 1;
     }
 
-    ((*list)->size)--;
+    (list->size)--;
     // unlink the node from linked list
     prev->next = current->next;
     // free memory
@@ -62,8 +62,8 @@ int delete_list_node(List **list, Tuple data) {
     return 0;
 }
 
-List_node *search_list_node(List **list, Tuple data) {
-    List_node *current = (*list)->head;
+List_node *search_list_node(List *list, Tuple data) {
+    List_node *current = list->head;
 
     while (current != NULL) {
         if (compare_tuples(current->tuple, data) == 0) {
@@ -85,8 +85,8 @@ void print_list(List *list) {
     }
 }
 
-void delete_list(List **list) {
-    List_node *current = (*list)->head;
+void delete_list(List *list) {
+    List_node *current = list->head;
     List_node *next;
 
     while (current != NULL) {
@@ -94,7 +94,7 @@ void delete_list(List **list) {
         free(current);
         current = next;
     }
-    free(*list);
+    free(list);
 }
 
 int compare_tuples(Tuple tuple1, Tuple tuple2) {

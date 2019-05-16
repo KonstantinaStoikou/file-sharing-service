@@ -50,7 +50,7 @@ int main(int argc, char const *argv[]) {
 
     char *client_list_msg = send_getclients_msg(sock);
     // parse client list string
-    parse_client_list(client_list_msg, &client_list);
+    parse_client_list(client_list_msg, client_list);
     free(client_list_msg);
     close(sock);
 

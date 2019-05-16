@@ -5,7 +5,7 @@
 #include "../include/list.h"
 
 // Handle requests in a connection from sever side
-void handle_client_connection(int sockfd, List** list,
+void handle_client_connection(int sockfd, List* list,
                               struct sockaddr_in server);
 // Send a LOG_ON message to server
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
@@ -14,8 +14,8 @@ void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
 // string
 char* send_getclients_msg(int sockfd);
 // Parse string with client list entries and store them to the list struct
-void parse_client_list(char* str, List** list);
+void parse_client_list(char* str, List* list);
 // Create a string with client tuples and send it to client who made request
-void send_client_list(List** list, Tuple tup, int sockfd);
+void send_client_list(List* list, Tuple tup, int sockfd);
 
 #endif
