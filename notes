@@ -1,7 +1,8 @@
 NOTES:
 
 - LOG_OFF vs USER_OFF minima apo server
-- maybe split handle server connection to smaller functions
+- to buffer exei strings i structs?
+- maybe list can be passed with single pointer to list functions
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -11,3 +12,9 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
+    - complete second paragraph in client
+        - create circular buffer
+        - test circular buffer
+        - start worker threads
+        - break function startsession to initialize client struct and open port fuctions
+        - see select() function

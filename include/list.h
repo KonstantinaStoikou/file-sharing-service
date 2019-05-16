@@ -30,7 +30,7 @@ int delete_list_node(List **list, Tuple data);
 // Search for a node with the given data and return it, return NULL if it
 // doesn't exist
 List_node *search_list_node(List **list, Tuple data);
-// Print all the tuple in the list
+// Print all tuples in the list
 void print_list(List *list);
 // Release memory of list
 void delete_list(List **list);
