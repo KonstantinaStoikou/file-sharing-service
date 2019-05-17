@@ -56,27 +56,8 @@ void handle_client_connection(int sockfd, List *list,
                 exit(EXIT_SUCCESS);
         }
         // parent will send USER_ON messages to all other clients in the list
-        List_node *current = list->head;
-        while (current != NULL) {
-            // send only to other clients, not the same one
-            if (compare_tuples(current->tuple, tup) == 1) {
-                struct sockaddr_in server;
-                struct sockaddr *serverptr = (struct sockaddr *)&server;
-                server.sin_family = AF_INET;  // internet domain
-                server.sin_addr.s_addr = current->tuple.ip_address.s_addr;
-                server.sin_port = current->tuple.port_num;
+        send_useron(list, tup);
 
-                int newsock = start_new_session(serverptr, server);
-                sprintf(msg, "USER_ON %d %d", tup.ip_address.s_addr,
-                        tup.port_num);
-                if (write(newsock, msg, BUF_SIZE) < 0) {
-                    perror(RED "Error writing to socket" RESET);
-                    exit(EXIT_FAILURE);
-                }
-                close(newsock);
-            }
-            current = current->next;
-        }
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
         struct in_addr ip;
         ip = client.sin_addr;
@@ -113,11 +94,7 @@ char *send_getclients_msg(int sockfd) {
         exit(EXIT_FAILURE);
     }
     char *buf = malloc(CLIENT_LIST_SIZE);
-    // read message from client
-    if (read(sockfd, buf, CLIENT_LIST_SIZE) < 0) {
-        perror(RED "Error reading from socket" RESET);
-        exit(EXIT_FAILURE);
-    }
+    read_message_from_socket(sockfd, buf, CLIENT_LIST_SIZE);
 
     return buf;
 }
@@ -186,4 +163,28 @@ void send_client_list(List *list, Tuple tup, int sockfd) {
         exit(EXIT_FAILURE);
     }
     // printf("Res: %s\n", response);
+}
+
+void send_useron(List *list, Tuple tup) {
+    char msg[BUF_SIZE];
+    List_node *current = list->head;
+    while (current != NULL) {
+        // send only to other clients, not the same one
+        if (compare_tuples(current->tuple, tup) == 1) {
+            struct sockaddr_in server;
+            struct sockaddr *serverptr = (struct sockaddr *)&server;
+            server.sin_family = AF_INET;  // internet domain
+            server.sin_addr.s_addr = current->tuple.ip_address.s_addr;
+            server.sin_port = current->tuple.port_num;
+
+            int newsock = start_new_session(serverptr, server);
+            sprintf(msg, "USER_ON %d %d", tup.ip_address.s_addr, tup.port_num);
+            if (write(newsock, msg, BUF_SIZE) < 0) {
+                perror(RED "Error writing to socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            close(newsock);
+        }
+        current = current->next;
+    }
 }

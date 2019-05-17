@@ -20,4 +20,4 @@ free port numbers:      49152 - 65535
 TO DO:
 - complete second paragraph in client
     - see select() function
-    - make user_on request from server
+    - parse user on request in client and add to list

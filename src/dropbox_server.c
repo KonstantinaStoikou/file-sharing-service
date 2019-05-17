@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
         // sock must be closed before it gets re-assigned
         close(newsock);
 
-        // print_list(client_list);
+        print_list(client_list);
     }
 
     close(sock);

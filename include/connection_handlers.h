@@ -17,5 +17,7 @@ char* send_getclients_msg(int sockfd);
 void parse_client_list(char* str, List* list);
 // Create a string with client tuples and send it to client who made request
 void send_client_list(List* list, Tuple tup, int sockfd);
+// For each client in the list, except the current one, send a USER_ON message
+void send_useron(List* list, Tuple tup);
 
 #endif

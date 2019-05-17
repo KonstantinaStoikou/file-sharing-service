@@ -66,7 +66,7 @@ int main(int argc, char const *argv[]) {
     // initialize citcular buffer
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
-    // print_list(client_list);
+    print_list(client_list);
 
     // create an array to store thread ids
     pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
