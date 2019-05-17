@@ -15,7 +15,7 @@
 #include "../include/tuple.h"
 
 int main(int argc, char const *argv[]) {
-    int port, sock, newsock;
+    int port;
     struct sockaddr_in server, client;
     socklen_t clientlen;
     struct sockaddr *serverptr = (struct sockaddr *)&server;
@@ -23,13 +23,14 @@ int main(int argc, char const *argv[]) {
 
     read_server_arguments(argc, argv, &port);
 
-    sock = start_listening_port(serverptr, &server, port);
+    int sock = start_listening_port(serverptr, &server, port);
 
     // initialize list to store client info
     List *client_list = initialize_list();
 
     while (1) {
         // accept connection
+        int newsock;
         if ((newsock = accept(sock, clientptr, &clientlen)) < 0) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
@@ -42,7 +43,7 @@ int main(int argc, char const *argv[]) {
         // sock must be closed before it gets re-assigned
         close(newsock);
 
-        print_list(client_list);
+        // print_list(client_list);
     }
 
     close(sock);

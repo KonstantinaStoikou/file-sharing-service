@@ -74,7 +74,8 @@ struct in_addr get_client_info() {
         herror(RED "Error in gethostbyname" RESET);
         exit(EXIT_FAILURE);
     }
+
     struct in_addr client_addr;
-    client_addr.s_addr = htonl(*rem_client->h_addr);
+    client_addr.s_addr = ((struct in_addr *)rem_client->h_addr_list[0])->s_addr;
     return client_addr;
 }

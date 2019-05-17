@@ -11,7 +11,7 @@
 #define RESET "\033[0m"
 
 // the size of the socket buffer
-#define BUF_SIZE 200
+#define BUF_SIZE 256
 // the size of the buffer for the message CLIENT_LIST
 #define CLIENT_LIST_SIZE 1000
 // the size of the buffer for a simple tuple

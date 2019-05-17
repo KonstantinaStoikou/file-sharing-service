@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "../include/defines.h"
 #include "../include/read_functions.h"
+#include "../include/session_functions.h"
 #include "../include/tuple.h"
 
 void handle_client_connection(int sockfd, List *list,
@@ -40,11 +41,41 @@ void handle_client_connection(int sockfd, List *list,
 
         // empty message string
         memset(msg, 0, strlen(msg));
-        // read message from client (client will ask for client list
-        read_message_from_socket(sockfd, msg, BUF_SIZE);
+        // create child to receive message GET_CLIENTS from client and send the
+        // list
+        switch (fork()) {
+            case -1:
+                perror(RED "Error forking child" RESET);
+                break;
+            case 0:
+                // read message from client (client will ask for client list)
+                read_message_from_socket(sockfd, msg, BUF_SIZE);
+                if (strcmp(msg, "GET_CLIENTS") == 0) {
+                    send_client_list(list, tup, sockfd);
+                }
+                exit(EXIT_SUCCESS);
+        }
+        // parent will send USER_ON messages to all other clients in the list
+        List_node *current = list->head;
+        while (current != NULL) {
+            // send only to other clients, not the same one
+            if (compare_tuples(current->tuple, tup) == 1) {
+                struct sockaddr_in server;
+                struct sockaddr *serverptr = (struct sockaddr *)&server;
+                server.sin_family = AF_INET;  // internet domain
+                server.sin_addr.s_addr = current->tuple.ip_address.s_addr;
+                server.sin_port = current->tuple.port_num;
 
-        if (strcmp(msg, "GET_CLIENTS") == 0) {
-            send_client_list(list, tup, sockfd);
+                int newsock = start_new_session(serverptr, server);
+                sprintf(msg, "USER_ON %d %d", tup.ip_address.s_addr,
+                        tup.port_num);
+                if (write(newsock, msg, BUF_SIZE) < 0) {
+                    perror(RED "Error writing to socket" RESET);
+                    exit(EXIT_FAILURE);
+                }
+                close(newsock);
+            }
+            current = current->next;
         }
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
         struct in_addr ip;
@@ -61,8 +92,8 @@ void handle_client_connection(int sockfd, List *list,
 
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
                     struct sockaddr_in client) {
-    printf("Client: Port: %d, Address: %s\n", client.sin_port,
-           inet_ntoa(client_ip));
+    printf("This Client: Port: %d, Address: %d\n", client.sin_port,
+           client_ip.s_addr);
 
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
@@ -154,5 +185,5 @@ void send_client_list(List *list, Tuple tup, int sockfd) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
-    printf("Res: %s\n", response);
+    // printf("Res: %s\n", response);
 }

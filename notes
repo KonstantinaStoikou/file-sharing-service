@@ -4,6 +4,11 @@ NOTES:
 - to buffer exei strings i structs?
 - ntohl/s?
 - client has ip address 127.0.0.1 -> loopback address can't be used in other computers
+- pou ginetai to copy? se poion fakelo? (clientName/pathname -> pou vrisketai?)
+- ti grafoume ston buffer?
+    - isos ta tuples tis listas me ta client info
+- ta threads moirazontai kikliko buffer kai lista
+- koitao mipos spaso to startlisteningport (sta stoixeia tou server)
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -14,5 +19,5 @@ free port numbers:      49152 - 65535
 
 TO DO:
 - complete second paragraph in client
-    - start worker threads
     - see select() function
+    - make user_on request from server
