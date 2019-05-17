@@ -38,9 +38,8 @@ int main(int argc, char const *argv[]) {
         printf("Client: Port: %d, Address: %s\n", client.sin_port,
                inet_ntoa(client.sin_addr));
 
-        handle_client_connection(newsock, client_list, client);
-        // close socket
-        // sock must be closed before it gets re-assigned
+        handle_server_connection(newsock, client_list, client);
+        // close socket, sock must be closed before it gets re-assigned
         close(newsock);
 
         print_list(client_list);

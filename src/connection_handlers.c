@@ -11,7 +11,7 @@
 #include "../include/session_functions.h"
 #include "../include/tuple.h"
 
-void handle_client_connection(int sockfd, List *list,
+void handle_server_connection(int sockfd, List *list,
                               struct sockaddr_in client) {
     char msg[BUF_SIZE];
     // read message from client
@@ -67,6 +67,37 @@ void handle_client_connection(int sockfd, List *list,
         tup.port_num = port;
         if (delete_list_node(list, tup) == 1) {
             printf(RED "Tuple doesn't exist.\n" RESET);
+        }
+    }
+}
+
+void handle_client_connection(int sockfd, List *list,
+                              struct sockaddr_in client) {
+    char msg[BUF_SIZE];
+    // read message from client
+    read_message_from_socket(sockfd, msg, BUF_SIZE);
+    printf("MSG: -%s-\n", msg);
+
+    // break message into words
+    char *words[3];  // maximum number of words for a message is 2
+    int count = 0;
+    char *word = strtok(msg, " ");  // split message by spaces
+    while (word) {
+        words[count] = word;
+        count++;
+        word = strtok(NULL, " ");
+    }
+    printf("tok: %s\n", words[0]);
+    if (strcmp(words[0], "USER_ON") == 0) {
+        struct in_addr ip;
+        int ip32 = atoi(words[1]);
+        ip = *(struct in_addr *)&ip32;
+        unsigned short port = atoi(words[2]);
+        Tuple tup;
+        tup.ip_address = ip;
+        tup.port_num = port;
+        if (add_list_node(list, tup) == NULL) {
+            printf(RED "Tuple already exists.\n" RESET);
         }
     }
 }

@@ -21,3 +21,7 @@ TO DO:
 - complete second paragraph in client
     - see select() function
     - parse user on request in client and add to list
+
+
+READ_ME:
+- grafo pos dinontai ta minimata sta sockets: request format

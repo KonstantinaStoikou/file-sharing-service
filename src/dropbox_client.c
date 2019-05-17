@@ -90,15 +90,14 @@ int main(int argc, char const *argv[]) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
         }
-        // printf("Client: Port: %d, Address: %s\n", other_client.sin_port,
-        //        inet_ntoa(other_client.sin_addr));
-        char msg[BUF_SIZE];
-        // read message from client
-        read_message_from_socket(newsock, msg, BUF_SIZE);
-        printf("MSG: %s\n", msg);
-        // close socket
-        // sock must be closed before it gets re-assigned
+        printf("Client: Port: %d, Address: %s\n", other_client.sin_port,
+               inet_ntoa(other_client.sin_addr));
+
+        handle_client_connection(newsock, client_list, other_client);
+        // close socket, sock must be closed before it gets re-assigned
         close(newsock);
+
+        print_list(client_list);
     }
 
     return 0;

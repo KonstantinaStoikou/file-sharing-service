@@ -4,9 +4,12 @@
 #include <netinet/in.h>
 #include "../include/list.h"
 
-// Handle requests in a connection from sever side
-void handle_client_connection(int sockfd, List* list,
+// Handle requests in a connection from server side
+void handle_server_connection(int sockfd, List* list,
                               struct sockaddr_in server);
+// Handle requests from other clients/server in a connection from client side
+void handle_client_connection(int sockfd, List* list,
+                              struct sockaddr_in client);
 // Send a LOG_ON message to server
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
                     struct sockaddr_in client);
