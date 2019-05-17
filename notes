@@ -7,7 +7,6 @@ NOTES:
 - ti grafoume ston buffer?
     - isos ta tuples tis listas me ta client info
 - ta threads moirazontai kikliko buffer kai lista
-- koitao mipos spaso to startlisteningport (sta stoixeia tou server)
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu

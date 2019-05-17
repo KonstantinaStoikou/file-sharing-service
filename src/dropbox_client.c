@@ -14,6 +14,7 @@
 #include "../include/list.h"
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
+#include "../include/signal_handlers.h"
 
 void *do_nothing(void *arg) {
     // printf("thread %ld\n", pthread_self());
@@ -86,13 +87,24 @@ int main(int argc, char const *argv[]) {
     // start listening for requests from other clients or the server
     int listen_sock = start_listening_port(clientptr, client, port);
 
+    // set signal handler
+    struct sigaction act1;
+    act1.sa_handler = exit_action;
+    act1.sa_flags = 0;
+    sigaction(SIGINT, &act1, NULL);
+
     while (1) {
         // accept connection
         int newsock;
         if ((newsock = accept(listen_sock, other_clientptr, &other_clientlen)) <
             0) {
             perror(RED "Error while accepting connection" RESET);
-            exit(EXIT_FAILURE);
+            // exit(EXIT_FAILURE);
+        }
+        // check if SIGINT was received
+        if (exit_var == 1) {
+            printf("Exit!\n");
+            exit(EXIT_SUCCESS);
         }
         printf("Client: Port: %d, Address: %s\n", other_client.sin_port,
                inet_ntoa(other_client.sin_addr));
