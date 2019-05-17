@@ -36,6 +36,11 @@ int start_new_session_bind(struct sockaddr *serverptr,
         perror(RED "Error while creating socket" RESET);
         exit(EXIT_FAILURE);
     }
+    // override fails in bind
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) <
+        0) {
+        perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
+    }
 
     // bind socket to address
     if (bind(sock, clientptr, sizeof(client)) < 0) {
