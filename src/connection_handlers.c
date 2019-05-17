@@ -208,7 +208,17 @@ void send_useron(List *list, Tuple tup) {
             server.sin_addr.s_addr = current->tuple.ip_address.s_addr;
             server.sin_port = current->tuple.port_num;
 
-            int newsock = start_new_session(serverptr, server);
+            int newsock;
+            // create socket
+            if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+                perror(RED "Error while creating socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            // initiate connection
+            if (connect(newsock, serverptr, sizeof(server)) < 0) {
+                perror(RED "Error while connecting" RESET);
+                exit(EXIT_FAILURE);
+            }
             sprintf(msg, "USER_ON %d %d", tup.ip_address.s_addr, tup.port_num);
             if (write(newsock, msg, BUF_SIZE) < 0) {
                 perror(RED "Error writing to socket" RESET);

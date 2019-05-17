@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]) {
 
     // start new session with server and send LOG_ON message with this client's
     // info
-    int sock = start_new_session_bind(serverptr, server, clientptr, client);
+    int sock = start_new_session(serverptr, server, clientptr, client);
     printf("Server: Port: %d, Address: %s\n", server.sin_port,
            inet_ntoa(server.sin_addr));
     send_logon_msg(sock, port, client_ip, client);

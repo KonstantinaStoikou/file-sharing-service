@@ -16,10 +16,13 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
-- complete second paragraph in client
-    - see select() function
+- see select() function
+- before log_off message, stop threads and reallocate memory
+- make log off message  
+    - server parse message
+    - server send message to clients
+    - clients parse message
 
 
 READ_ME:
 - request format (how request strings are givn in sockets)
-- before log_off message, stop threads and reallocate memory
