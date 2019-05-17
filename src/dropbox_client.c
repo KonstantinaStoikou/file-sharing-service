@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]) {
 
     // start new session with server and send LOG_ON message with this client's
     // info
-    int sock = start_new_session(serverptr, server);
+    int sock = start_new_session_bind(serverptr, server, clientptr, client);
     printf("Server: Port: %d, Address: %s\n", server.sin_port,
            inet_ntoa(server.sin_addr));
     send_logon_msg(sock, port, client_ip, client);
@@ -95,18 +95,19 @@ int main(int argc, char const *argv[]) {
 
     while (1) {
         // accept connection
-        int newsock;
-        if ((newsock = accept(listen_sock, other_clientptr, &other_clientlen)) <
-            0) {
-            perror(RED "Error while accepting connection" RESET);
-            // exit(EXIT_FAILURE);
-        }
+        int newsock = accept(listen_sock, other_clientptr, &other_clientlen);
+
         // check if SIGINT was received
-        if (exit_var == 1) {
+        if (newsock < 0 && exit_var == 1) {
             printf("Exit!\n");
             exit(EXIT_SUCCESS);
         }
-        printf("Client: Port: %d, Address: %s\n", other_client.sin_port,
+        // else if ordinary error was caused display error message
+        else if (newsock < 0) {
+            perror(RED "Error while accepting connection" RESET);
+            exit(EXIT_FAILURE);
+        }
+        printf("Client: Port: %d, Address: %s\n", htons(other_client.sin_port),
                inet_ntoa(other_client.sin_addr));
 
         handle_client_connection(newsock, client_list, other_client);

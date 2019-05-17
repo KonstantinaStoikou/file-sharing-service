@@ -22,3 +22,4 @@ TO DO:
 
 READ_ME:
 - request format (how request strings are givn in sockets)
+- before log_off message, stop threads and reallocate memory
