@@ -26,7 +26,7 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server) {
     return sock;
 }
 
-int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in *server,
+int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in server,
                          int port) {
     int listen_sock;
 
@@ -41,12 +41,8 @@ int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in *server,
         perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
     }
 
-    server->sin_family = AF_INET;  // internet domain
-    server->sin_addr.s_addr = htonl(INADDR_ANY);
-    server->sin_port = htons(port);
-
     // bind socket to address
-    if (bind(listen_sock, serverptr, sizeof(*server)) < 0) {
+    if (bind(listen_sock, serverptr, sizeof(server)) < 0) {
         perror(RED "Error while binding socket to address" RESET);
         exit(EXIT_FAILURE);
     }

@@ -8,7 +8,7 @@
 int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server);
 // Create socket for server (or client working as server) and start listen to
 // this port, return listening socket's file descriptor
-int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in *server,
+int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in server,
                          int port);
 // Get client's address in network byte order
 struct in_addr get_client_info();

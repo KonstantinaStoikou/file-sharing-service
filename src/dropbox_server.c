@@ -23,7 +23,11 @@ int main(int argc, char const *argv[]) {
 
     read_server_arguments(argc, argv, &port);
 
-    int sock = start_listening_port(serverptr, &server, port);
+    server.sin_family = AF_INET;  // internet domain
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port = htons(port);
+
+    int sock = start_listening_port(serverptr, server, port);
 
     // initialize list to store client info
     List *client_list = initialize_list();

@@ -35,8 +35,9 @@ int main(int argc, char const *argv[]) {
     // get clients ip address
     struct in_addr client_ip = get_client_info();
 
-    // start listening for requests from other clients or the server
-    int listen_sock = start_listening_port(clientptr, &client, port);
+    client.sin_family = AF_INET;  // internet domain
+    client.sin_addr.s_addr = htonl(INADDR_ANY);
+    client.sin_port = htons(port);
 
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
@@ -81,6 +82,9 @@ int main(int argc, char const *argv[]) {
     struct sockaddr_in other_client;
     socklen_t other_clientlen;
     struct sockaddr *other_clientptr = (struct sockaddr *)&other_client;
+
+    // start listening for requests from other clients or the server
+    int listen_sock = start_listening_port(clientptr, client, port);
 
     while (1) {
         // accept connection
