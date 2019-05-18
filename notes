@@ -1,7 +1,5 @@
 NOTES:
 
-- LOG_OFF vs USER_OFF minima apo server
-- to buffer exei strings i structs?
 - client has ip address 127.0.0.1 -> loopback address can't be used in other computers
 - pou ginetai to copy? se poion fakelo? (clientName/pathname -> pou vrisketai?)
 - ti grafoume ston buffer?

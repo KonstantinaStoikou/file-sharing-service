@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -23,9 +24,15 @@ int main(int argc, char const *argv[]) {
 
     read_server_arguments(argc, argv, &port);
 
+    // get clients ip address
+    struct in_addr server_ip = get_client_info();
+
     server.sin_family = AF_INET;  // internet domain
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(port);
+
+    printf("This Server: Port: %d, Address: %s\n", server.sin_port,
+           inet_ntoa(server_ip));
 
     int sock = start_listening_port(serverptr, server, port);
 
@@ -39,6 +46,13 @@ int main(int argc, char const *argv[]) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
         }
+
+        // if server and client are running on the same device, convert private
+        // ip to public ip
+        if (strcmp(inet_ntoa(client.sin_addr), "127.0.0.1") == 0) {
+            memcpy(&client.sin_addr, &server_ip, sizeof(server_ip));
+        }
+
         printf("Client: Port: %d, Address: %s\n", client.sin_port,
                inet_ntoa(client.sin_addr));
 

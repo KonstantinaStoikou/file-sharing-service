@@ -40,6 +40,9 @@ int main(int argc, char const *argv[]) {
     client.sin_addr.s_addr = htonl(INADDR_ANY);
     client.sin_port = htons(port);
 
+    printf("This Client: Port: %d, Address: %s\n", client.sin_port,
+           inet_ntoa(client_ip));
+
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
         exit(EXIT_FAILURE);
@@ -52,8 +55,6 @@ int main(int argc, char const *argv[]) {
     // start new session with server and send LOG_ON message with this client's
     // info
     int sock = start_new_session(serverptr, server, clientptr, client);
-    printf("Server: Port: %d, Address: %s\n", server.sin_port,
-           inet_ntoa(server.sin_addr));
     send_logon_msg(sock, port, client_ip, client);
 
     // initialize list to store other clients' info
@@ -88,10 +89,10 @@ int main(int argc, char const *argv[]) {
     int listen_sock = start_listening_port(clientptr, client, port);
 
     // set signal handler
-    struct sigaction act1;
-    act1.sa_handler = exit_action;
-    act1.sa_flags = 0;
-    sigaction(SIGINT, &act1, NULL);
+    struct sigaction act;
+    act.sa_handler = exit_action;
+    act.sa_flags = 0;
+    sigaction(SIGINT, &act, NULL);
 
     while (1) {
         // accept connection
@@ -113,8 +114,8 @@ int main(int argc, char const *argv[]) {
             perror(RED "Error while accepting connection" RESET);
             exit(EXIT_FAILURE);
         }
-        printf("Client: Port: %d, Address: %s\n", htons(other_client.sin_port),
-               inet_ntoa(other_client.sin_addr));
+        printf("Client: Port: %d, Address: %d\n", htons(other_client.sin_port),
+               other_client.sin_addr.s_addr);
 
         handle_client_connection(newsock, client_list, other_client);
         // close socket, sock must be closed before it gets re-assigned

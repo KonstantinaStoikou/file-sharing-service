@@ -60,18 +60,15 @@ void handle_server_connection(int sockfd, List *list,
         send_useron_msg(list, tup);
 
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
-        struct in_addr ip;
-        int ip32 = atoi(words[1]);
-        ip = *(struct in_addr *)&ip32;
-        unsigned short port = atoi(words[2]);
         Tuple tup;
-        tup.ip_address = ip;
-        tup.port_num = port;
+        tup.ip_address = client.sin_addr;
+        tup.port_num = client.sin_port;
         if (delete_list_node(list, tup) == 1) {
             printf(RED "Tuple doesn't exist.\n" RESET);
+        } else {
+            // send USER_OFF messages to all other clients in the list
+            send_useroff_msg(list, tup);
         }
-        // send USER_OFF messages to all other clients in the list
-        send_useroff_msg(list, tup);
     }
 }
 
@@ -114,14 +111,12 @@ void handle_client_connection(int sockfd, List *list,
         if (delete_list_node(list, tup) == 1) {
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
+    } else if (strcmp(words[0], "GET_FILE_LIST") == 0) {
     }
 }
 
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
                     struct sockaddr_in client) {
-    printf("This Client: Port: %d, Address: %d\n", client.sin_port,
-           client_ip.s_addr);
-
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
     sprintf(msg, "LOG_ON %d %d", client_ip.s_addr, client.sin_port);
@@ -133,9 +128,9 @@ void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
 
 void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
                      struct sockaddr_in client) {
-    // inform server that this new client has arrived
+    // inform server that this client has exited
     char msg[BUF_SIZE];
-    sprintf(msg, "LOG_OFF %d %d", client_ip.s_addr, client.sin_port);
+    strcpy(msg, "LOG_OFF");
     if (write(sockfd, msg, BUF_SIZE) < 0) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
@@ -157,7 +152,7 @@ char *send_getclients_msg(int sockfd) {
 }
 
 void parse_client_list(char *str, List *list) {
-    printf("msg: %s\n", str);
+    printf("Client list: %s\n", str);
     // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
     // break message into words
     int count = 0;
