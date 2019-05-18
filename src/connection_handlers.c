@@ -65,7 +65,7 @@ void handle_server_connection(int sockfd, List *list,
         tup.ip_address = client.sin_addr;
         tup.port_num = client.sin_port;
         if (delete_list_node(list, tup) == 1) {
-            printf(RED "Tuple doesn't exist.\n" RESET);
+            printf(RED "ERROR_IP_PORT_NOT_FOUND_IN_LIST\n" RESET);
         } else {
             // send USER_OFF messages to all other clients in the list
             send_useroff_msg(list, tup);

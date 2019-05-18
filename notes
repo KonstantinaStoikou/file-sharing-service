@@ -16,8 +16,6 @@ free port numbers:      49152 - 65535
 TO DO:
 - see select() function
 - before log_off message, stop threads and reallocate memory
-- error in log off that server sends
-- get file list
 - get file
 
 
