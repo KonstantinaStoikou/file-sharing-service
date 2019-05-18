@@ -19,7 +19,6 @@ TO DO:
 - see select() function
 - before log_off message, stop threads and reallocate memory
 - make log off message  
-    - server parse message
     - server send message to clients
     - clients parse message
 

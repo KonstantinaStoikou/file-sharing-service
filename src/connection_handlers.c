@@ -56,12 +56,13 @@ void handle_server_connection(int sockfd, List *list,
                 exit(EXIT_SUCCESS);
         }
         // parent will send USER_ON messages to all other clients in the list
-        send_useron(list, tup);
+        send_useron_msg(list, tup);
 
     } else if (strcmp(words[0], "LOG_OFF") == 0) {
         struct in_addr ip;
-        ip = client.sin_addr;
-        unsigned short port = client.sin_port;
+        int ip32 = atoi(words[1]);
+        ip = *(struct in_addr *)&ip32;
+        unsigned short port = atoi(words[2]);
         Tuple tup;
         tup.ip_address = ip;
         tup.port_num = port;
@@ -196,7 +197,7 @@ void send_client_list(List *list, Tuple tup, int sockfd) {
     // printf("Res: %s\n", response);
 }
 
-void send_useron(List *list, Tuple tup) {
+void send_useron_msg(List *list, Tuple tup) {
     char msg[BUF_SIZE];
     List_node *current = list->head;
     while (current != NULL) {
@@ -227,5 +228,16 @@ void send_useron(List *list, Tuple tup) {
             close(newsock);
         }
         current = current->next;
+    }
+}
+
+void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
+                     struct sockaddr_in client) {
+    // inform server that this new client has arrived
+    char msg[BUF_SIZE];
+    sprintf(msg, "LOG_OFF %d %d", client_ip.s_addr, client.sin_port);
+    if (write(sockfd, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
     }
 }

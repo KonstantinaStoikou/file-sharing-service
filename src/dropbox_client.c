@@ -99,6 +99,12 @@ int main(int argc, char const *argv[]) {
 
         // check if SIGINT was received
         if (newsock < 0 && exit_var == 1) {
+            close(listen_sock);
+            // send message LOG_OFF to server
+            int serv_sock =
+                start_new_session(serverptr, server, clientptr, client);
+            send_logoff_msg(serv_sock, port, client_ip, client);
+            close(serv_sock);
             printf("Exit!\n");
             exit(EXIT_SUCCESS);
         }
