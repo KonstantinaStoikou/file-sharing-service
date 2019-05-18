@@ -13,6 +13,9 @@ void handle_client_connection(int sockfd, List* list,
 // Send a LOG_ON message to server
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
                     struct sockaddr_in client);
+// Send a LOG_OFF message to server
+void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
+                     struct sockaddr_in client);
 // Send a GET_CLIENTS message to server and get response and return the response
 // string
 char* send_getclients_msg(int sockfd);
@@ -22,8 +25,7 @@ void parse_client_list(char* str, List* list);
 void send_client_list(List* list, Tuple tup, int sockfd);
 // For each client in the list, except the current one, send a USER_ON message
 void send_useron_msg(List* list, Tuple tup);
-// Send a LOG_OFF message to server
-void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
-                     struct sockaddr_in client);
+// For each client in the list, except the current one, send a USER_OFF message
+void send_useroff_msg(List* list, Tuple tup);
 
 #endif

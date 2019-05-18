@@ -16,6 +16,7 @@ void handle_server_connection(int sockfd, List *list,
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
+    printf("MSG: %s\n", msg);
 
     // break message into words
     char *words[3];  // maximum number of words for a message is 3
@@ -69,6 +70,8 @@ void handle_server_connection(int sockfd, List *list,
         if (delete_list_node(list, tup) == 1) {
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
+        // send USER_OFF messages to all other clients in the list
+        send_useroff_msg(list, tup);
     }
 }
 
@@ -77,7 +80,7 @@ void handle_client_connection(int sockfd, List *list,
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
-    printf("MSG: -%s-\n", msg);
+    printf("MSG: %s\n", msg);
 
     // break message into words
     char *words[3];  // maximum number of words for a message is 2
@@ -88,7 +91,7 @@ void handle_client_connection(int sockfd, List *list,
         count++;
         word = strtok(NULL, " ");
     }
-    printf("tok: %s\n", words[0]);
+
     if (strcmp(words[0], "USER_ON") == 0) {
         struct in_addr ip;
         int ip32 = atoi(words[1]);
@@ -99,6 +102,17 @@ void handle_client_connection(int sockfd, List *list,
         tup.port_num = port;
         if (add_list_node(list, tup) == NULL) {
             printf(RED "Tuple already exists.\n" RESET);
+        }
+    } else if (strcmp(words[0], "USER_OFF") == 0) {
+        struct in_addr ip;
+        int ip32 = atoi(words[1]);
+        ip = *(struct in_addr *)&ip32;
+        unsigned short port = atoi(words[2]);
+        Tuple tup;
+        tup.ip_address = ip;
+        tup.port_num = port;
+        if (delete_list_node(list, tup) == 1) {
+            printf(RED "Tuple doesn't exist.\n" RESET);
         }
     }
 }
@@ -111,6 +125,17 @@ void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
     sprintf(msg, "LOG_ON %d %d", client_ip.s_addr, client.sin_port);
+    if (write(sockfd, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
+                     struct sockaddr_in client) {
+    // inform server that this new client has arrived
+    char msg[BUF_SIZE];
+    sprintf(msg, "LOG_OFF %d %d", client_ip.s_addr, client.sin_port);
     if (write(sockfd, msg, BUF_SIZE) < 0) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
@@ -231,13 +256,36 @@ void send_useron_msg(List *list, Tuple tup) {
     }
 }
 
-void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
-                     struct sockaddr_in client) {
-    // inform server that this new client has arrived
+void send_useroff_msg(List *list, Tuple tup) {
     char msg[BUF_SIZE];
-    sprintf(msg, "LOG_OFF %d %d", client_ip.s_addr, client.sin_port);
-    if (write(sockfd, msg, BUF_SIZE) < 0) {
-        perror(RED "Error writing to socket" RESET);
-        exit(EXIT_FAILURE);
+    List_node *current = list->head;
+    while (current != NULL) {
+        // send only to other clients, not the same one
+        if (compare_tuples(current->tuple, tup) == 1) {
+            struct sockaddr_in server;
+            struct sockaddr *serverptr = (struct sockaddr *)&server;
+            server.sin_family = AF_INET;  // internet domain
+            server.sin_addr.s_addr = current->tuple.ip_address.s_addr;
+            server.sin_port = current->tuple.port_num;
+
+            int newsock;
+            // create socket
+            if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+                perror(RED "Error while creating socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            // initiate connection
+            if (connect(newsock, serverptr, sizeof(server)) < 0) {
+                perror(RED "Error while connecting" RESET);
+                exit(EXIT_FAILURE);
+            }
+            sprintf(msg, "USER_OFF %d %d", tup.ip_address.s_addr, tup.port_num);
+            if (write(newsock, msg, BUF_SIZE) < 0) {
+                perror(RED "Error writing to socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            close(newsock);
+        }
+        current = current->next;
     }
 }
