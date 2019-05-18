@@ -1,5 +1,6 @@
 #include "../include/connection_handlers.h"
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -72,8 +73,8 @@ void handle_server_connection(int sockfd, List *list,
     }
 }
 
-void handle_client_connection(int sockfd, List *list,
-                              struct sockaddr_in client) {
+void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
+                              char *dirname) {
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
@@ -112,6 +113,9 @@ void handle_client_connection(int sockfd, List *list,
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
     } else if (strcmp(words[0], "GET_FILE_LIST") == 0) {
+        Pathlist *list = initialize_pathlist();
+        list_files(list, dirname);
+        print_pathlist(list);
     }
 }
 
@@ -283,4 +287,23 @@ void send_useroff_msg(List *list, Tuple tup) {
         }
         current = current->next;
     }
+}
+
+void list_files(Pathlist *list, char *dirname) {
+    struct dirent *dp;
+    DIR *dir = opendir(dirname);
+
+    while ((dp = readdir(dir)) != NULL) {
+        if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0) {
+            continue;
+        }
+        char path[PATH_SIZE];
+        sprintf(path, "%s/%s", dirname, dp->d_name);
+        if (dp->d_type == DT_DIR) {
+            list_files(list, path);
+        } else {
+            add_pathlist_node(list, path);
+        }
+    }
+    closedir(dir);
 }

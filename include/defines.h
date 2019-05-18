@@ -16,5 +16,7 @@
 #define CLIENT_LIST_SIZE 1000
 // the size of the buffer for a simple tuple
 #define TUPLE_BUF_SIZE 100
+// the size of the pathnames of files
+#define PATH_SIZE 128
 
 #endif

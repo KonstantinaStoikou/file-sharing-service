@@ -117,7 +117,7 @@ int main(int argc, char const *argv[]) {
         printf("Client: Port: %d, Address: %d\n", htons(other_client.sin_port),
                other_client.sin_addr.s_addr);
 
-        handle_client_connection(newsock, client_list, other_client);
+        handle_client_connection(newsock, client_list, other_client, dirname);
         // close socket, sock must be closed before it gets re-assigned
         close(newsock);
 
