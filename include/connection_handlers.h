@@ -11,26 +11,8 @@ void handle_server_connection(int sockfd, List* list,
 // Handle requests from other clients/server in a connection from client side
 void handle_client_connection(int sockfd, List* list, struct sockaddr_in client,
                               char* dirname);
-// Send a LOG_ON message to server
-void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
-                    struct sockaddr_in client);
-// Send a LOG_OFF message to server
-void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
-                     struct sockaddr_in client);
-// Send a GET_CLIENTS message to server and get response and return the response
-// string
-char* send_getclients_msg(int sockfd);
 // Parse string with client list entries and store them to the list struct
 void parse_client_list(char* str, List* list);
-// Create a string with client tuples and send it to client who made request
-void send_client_list(List* list, Tuple tup, int sockfd);
-// For each client in the list, except the current one, send a USER_ON message
-void send_useron_msg(List* list, Tuple tup);
-// For each client in the list, except the current one, send a USER_OFF message
-void send_useroff_msg(List* list, Tuple tup);
-// Create a string with file-version tuples and send it to client who made
-// request
-void send_file_list(Pathlist* list, int sockfd);
 // Add to a list all files (their paths) in a directory and its subdirectories
 // and return the list
 void list_files(Pathlist* list, char* dirname);

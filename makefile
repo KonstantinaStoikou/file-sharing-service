@@ -1,4 +1,4 @@
-OBJS 	= read_functions.o list.o connection_handlers.o session_functions.o circular_buffer.o signal_handlers.o pathlist.o
+OBJS 	= read_functions.o list.o connection_handlers.o session_functions.o circular_buffer.o signal_handlers.o pathlist.o send_functions.o
 OUT  	= dropbox_server dropbox_client test
 CC		= gcc
 FLAGS   = -Wall -g -c 
@@ -37,6 +37,9 @@ circular_buffer.o: src/circular_buffer.c
 
 signal_handlers.o: src/signal_handlers.c
 	$(CC) $(FLAGS) src/signal_handlers.c
+
+send_functions.o: src/send_functions.c
+	$(CC) $(FLAGS) src/send_functions.c
 
 clean:
 	rm -f $(OBJS) $(OUT) dropbox_client.o dropbox_server.o test.o

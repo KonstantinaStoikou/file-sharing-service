@@ -13,6 +13,7 @@
 #include "../include/defines.h"
 #include "../include/list.h"
 #include "../include/read_functions.h"
+#include "../include/send_functions.h"
 #include "../include/session_functions.h"
 #include "../include/signal_handlers.h"
 

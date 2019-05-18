@@ -17,7 +17,7 @@ TO DO:
 - see select() function
 - before log_off message, stop threads and reallocate memory
 - get file
-
+- parse functions to seperate file
 
 READ_ME:
 - request format (how request strings are givn in sockets)
