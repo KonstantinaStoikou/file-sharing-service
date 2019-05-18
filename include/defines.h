@@ -14,6 +14,10 @@
 #define BUF_SIZE 256
 // the size of the buffer for the message CLIENT_LIST
 #define CLIENT_LIST_SIZE 1000
+// the size of the buffer for the message FILE_LIST
+#define FILE_LIST_SIZE 1000
+// the size of the buffer for a file-version tuple
+#define FILE_BUF_SIZE 200
 // the size of the buffer for a simple tuple
 #define TUPLE_BUF_SIZE 100
 // the size of the pathnames of files

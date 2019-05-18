@@ -17,6 +17,7 @@ typedef struct Pathlist_node {
 // A pointer to the head of the list
 typedef struct Pathlist {
     Pathlist_node *head;
+    int size;
 } Pathlist;
 
 // Allocate memory for a new list struct and return it

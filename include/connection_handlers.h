@@ -28,6 +28,9 @@ void send_client_list(List* list, Tuple tup, int sockfd);
 void send_useron_msg(List* list, Tuple tup);
 // For each client in the list, except the current one, send a USER_OFF message
 void send_useroff_msg(List* list, Tuple tup);
+// Create a string with file-version tuples and send it to client who made
+// request
+void send_file_list(Pathlist* list, int sockfd);
 // Add to a list all files (their paths) in a directory and its subdirectories
 // and return the list
 void list_files(Pathlist* list, char* dirname);

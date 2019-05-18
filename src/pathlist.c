@@ -7,6 +7,7 @@
 Pathlist *initialize_pathlist(void) {
     Pathlist *list = malloc(sizeof(Pathlist));
     list->head = NULL;
+    list->size = 0;
 
     return list;
 }
@@ -22,6 +23,7 @@ Pathlist_node *add_pathlist_node(Pathlist *list, char *data) {
     new_node->next = list->head;
     // change head pointer as new node is added at the beginning
     list->head = new_node;
+    (list->size)++;
 
     return new_node;
 }
@@ -34,6 +36,7 @@ int delete_pathlist_node(Pathlist *list, char *data) {
     if (current != NULL && strcmp(current->path, data) == 0) {
         list->head = current->next;
         free(current);
+        (list->size)--;
         return 0;
     }
 
@@ -48,6 +51,7 @@ int delete_pathlist_node(Pathlist *list, char *data) {
     if (current == NULL) {
         return 1;
     }
+    (list->size)--;
     // unlink the node from linked list
     prev->next = current->next;
     // free memory
@@ -68,6 +72,7 @@ Pathlist_node *search_pathlist_node(Pathlist *list, char *data) {
 }
 
 void print_pathlist(Pathlist *list) {
+    printf("Size %d\n", list->size);
     Pathlist_node *current = list->head;
 
     while (current != NULL) {

@@ -53,7 +53,6 @@ int delete_list_node(List *list, Tuple data) {
     if (current == NULL) {
         return 1;
     }
-
     (list->size)--;
     // unlink the node from linked list
     prev->next = current->next;
