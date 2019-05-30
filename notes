@@ -18,6 +18,8 @@ TO DO:
 - before log_off message, stop threads and reallocate memory
 - get file
 - parse functions to seperate file
+- add first messages to circular buffer
+- make threads start readng from buffer
 
 READ_ME:
-- request format (how request strings are givn in sockets)
+- request format (how request strings are given in sockets)

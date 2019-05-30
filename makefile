@@ -1,15 +1,11 @@
 OBJS 	= read_functions.o list.o connection_handlers.o session_functions.o circular_buffer.o signal_handlers.o pathlist.o send_functions.o
-OUT  	= dropbox_server dropbox_client test
+OUT  	= dropbox_server dropbox_client
 CC		= gcc
 FLAGS   = -Wall -g -c 
 
-all: $(OBJS) dropbox_client.o dropbox_server.o test.o
+all: $(OBJS) dropbox_client.o dropbox_server.o
 	$(CC) -g $(OBJS) dropbox_server.o -o dropbox_server
 	$(CC) -g -pthread $(OBJS) dropbox_client.o -o dropbox_client
-	$(CC) -g $(OBJS) test.o -o test
-
-test.o: test.c
-	$(CC) $(FLAGS) test.c
 
 dropbox_server.o: src/dropbox_server.c
 	$(CC) $(FLAGS) src/dropbox_server.c
@@ -42,4 +38,4 @@ send_functions.o: src/send_functions.c
 	$(CC) $(FLAGS) src/send_functions.c
 
 clean:
-	rm -f $(OBJS) $(OUT) dropbox_client.o dropbox_server.o test.o
+	rm -f $(OBJS) $(OUT) dropbox_client.o dropbox_server.o
