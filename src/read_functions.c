@@ -1,4 +1,5 @@
 #include "../include/read_functions.h"
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,4 +47,23 @@ void read_message_from_socket(int sockfd, char *msg, int size) {
     if ((pos = strchr(msg, '\n')) != NULL) {
         *pos = '\0';
     }
+}
+
+void list_files(Pathlist *list, char *dirname) {
+    struct dirent *dp;
+    DIR *dir = opendir(dirname);
+
+    while ((dp = readdir(dir)) != NULL) {
+        if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0) {
+            continue;
+        }
+        char path[PATH_SIZE];
+        sprintf(path, "%s/%s", dirname, dp->d_name);
+        if (dp->d_type == DT_DIR) {
+            list_files(list, path);
+        } else {
+            add_pathlist_node(list, path);
+        }
+    }
+    closedir(dir);
 }
