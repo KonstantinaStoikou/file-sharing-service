@@ -6,7 +6,12 @@
 #ifndef LIST_HEADER
 #define LIST_HEADER
 
-#include "tuple.h"
+#include <netinet/in.h>
+
+typedef struct Tuple {
+    struct in_addr ip_address;
+    unsigned short port_num;
+} Tuple;
 
 // A node of the list
 typedef struct List_node {

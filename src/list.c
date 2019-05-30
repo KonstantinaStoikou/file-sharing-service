@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/defines.h"
-#include "../include/tuple.h"
 
 List *initialize_list(void) {
     List *list = malloc(sizeof(List));

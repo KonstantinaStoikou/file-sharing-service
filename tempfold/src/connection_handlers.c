@@ -10,7 +10,6 @@
 #include "../include/defines.h"
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
-#include "../include/tuple.h"
 
 void handle_server_connection(int sockfd, List *list,
                               struct sockaddr_in client) {

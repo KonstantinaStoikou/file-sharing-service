@@ -10,7 +10,6 @@
 #include "../include/defines.h"
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
-#include "../include/tuple.h"
 
 void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
                     struct sockaddr_in client) {

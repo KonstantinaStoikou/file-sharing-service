@@ -13,7 +13,6 @@
 #include "../include/list.h"
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
-#include "../include/tuple.h"
 
 int main(int argc, char const *argv[]) {
     int port;
