@@ -1,7 +1,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,11 +15,7 @@
 #include "../include/send_functions.h"
 #include "../include/session_functions.h"
 #include "../include/signal_handlers.h"
-
-void *do_nothing(void *arg) {
-    // printf("thread %ld\n", pthread_self());
-    pthread_exit(NULL);
-}
+#include "../include/thread_functions.h"
 
 int main(int argc, char const *argv[]) {
     char *dirname;
@@ -75,15 +70,7 @@ int main(int argc, char const *argv[]) {
     printf("Buffer is: \n");
     print_circ_buf(cb);
 
-    // create an array to store thread ids
-    pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
-    // create worker threads
-    for (int i = 0; i < worker_threads_num; i++) {
-        if (pthread_create(&t_ids[i], NULL, do_nothing, NULL) != 0) {
-            perror(RED "Error while creating threads");
-            exit(EXIT_FAILURE);
-        }
-    }
+    create_n_threads(worker_threads_num);
 
     struct sockaddr_in other_client;
     socklen_t other_clientlen;
