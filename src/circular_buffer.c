@@ -22,9 +22,9 @@ void delete_circ_buf(Circular_buffer *cb) {
     free(cb);
 }
 
-void push_back_circ_buf(Circular_buffer *cb, const void *item) {
+int push_back_circ_buf(Circular_buffer *cb, const void *item) {
     if (cb->count == cb->capacity) {
-        printf(RED "No space in circular buffer." RESET);
+        return 1;
     }
     memcpy(cb->head, item, cb->item_size);
     cb->head = (char *)cb->head + cb->item_size;
@@ -32,6 +32,7 @@ void push_back_circ_buf(Circular_buffer *cb, const void *item) {
         cb->head = cb->buffer;
     }
     cb->count++;
+    return 0;
 }
 
 void pop_front_circ_buf(Circular_buffer *cb, void *item) {
@@ -51,7 +52,7 @@ void print_circ_buf(Circular_buffer *cb) {
     while (current != cb->head) {
         Cb_data *item = malloc(sizeof(Cb_data));
         memcpy(item, current, cb->item_size);
-        printf("%s %d\n", item->pathname, item->version);
+        printf("%d %d\n", item->ip_address.s_addr, item->port_num);
         free(item);
         // get next item
         current = (char *)current + cb->item_size;

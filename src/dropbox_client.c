@@ -61,16 +61,19 @@ int main(int argc, char const *argv[]) {
     // initialize list to store other clients' info
     List *client_list = initialize_list();
 
-    char *client_list_msg = send_getclients_msg(sock);
-    // parse client list string
-    parse_client_list(client_list_msg, client_list);
-    free(client_list_msg);
-    close(sock);
-
     // initialize citcular buffer
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
+    char *client_list_msg = send_getclients_msg(sock);
+    // parse client list string
+    parse_client_list(client_list_msg, client_list, cb);
+    free(client_list_msg);
+    close(sock);
+
+    printf("List is: \n");
     print_list(client_list);
+    printf("Buffer is: \n");
+    print_circ_buf(cb);
 
     // create an array to store thread ids
     pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));

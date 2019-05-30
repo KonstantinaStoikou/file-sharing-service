@@ -121,7 +121,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
     }
 }
 
-void parse_client_list(char *str, List *list) {
+void parse_client_list(char *str, List *list, Circular_buffer *cb) {
     printf("Client list: %s\n", str);
     // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
     // break message into words
@@ -151,6 +151,17 @@ void parse_client_list(char *str, List *list) {
             tup.port_num = port;
             if (add_list_node(list, tup) == NULL) {
                 printf(RED "Tuple already exists.\n" RESET);
+            }
+            // add it as item to circular buffer
+            else {
+                Cb_data *data = malloc(sizeof(Cb_data));
+                data->pathname[0] = '\0';
+                data->version = 0;
+                data->ip_address = ip;
+                data->port_num = port;
+                if (push_back_circ_buf(cb, data) == 1) {
+                    printf(RED "Buffer is full, item couldn't be added." RESET);
+                }
             }
         }
         count++;
