@@ -70,7 +70,12 @@ int main(int argc, char const *argv[]) {
     printf("Buffer is: \n");
     print_circ_buf(cb);
 
-    create_n_threads(worker_threads_num);
+    // create struct ith shared variables to pass as argument to threads
+    Arg_struct *thr_args = malloc(sizeof(Arg_struct));
+    thr_args->cb = cb;
+    thr_args->client_list = client_list;
+    // create worker threads
+    create_n_threads(worker_threads_num, thr_args);
 
     struct sockaddr_in other_client;
     socklen_t other_clientlen;

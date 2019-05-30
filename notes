@@ -14,7 +14,8 @@ TO DO:
 - before log_off message, stop threads and reallocate memory
 - get file
 - parse functions to seperate file
-- make threads start readng from buffer
+- generally break functions to more files
+- make threads start reading from buffer
 
 READ_ME:
 - request format (how request strings are given in sockets)
