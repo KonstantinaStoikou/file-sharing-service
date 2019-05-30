@@ -13,9 +13,9 @@ TO DO:
 - see select() function
 - before log_off message, stop threads and reallocate memory
 - get file
-- parse functions to seperate file
 - generally break functions to more files
 - make threads start reading from buffer
+- add to thread arguments list the name of the local folder to store backups
 
 READ_ME:
 - request format (how request strings are given in sockets)
