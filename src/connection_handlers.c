@@ -75,7 +75,7 @@ void handle_server_connection(int sockfd, List *list,
 }
 
 void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
-                              char *dirname) {
+                              char *dirname, Circular_buffer *cb) {
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
@@ -101,6 +101,17 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         tup.port_num = port;
         if (add_list_node(list, tup) == NULL) {
             printf(RED "Tuple already exists.\n" RESET);
+        }
+        // add it as item to circular buffer
+        else {
+            Cb_data *data = malloc(sizeof(Cb_data));
+            data->pathname[0] = '\0';
+            data->version = 0;
+            data->ip_address = ip;
+            data->port_num = port;
+            if (push_back_circ_buf(cb, data) == 1) {
+                printf(RED "Buffer is full, item couldn't be added." RESET);
+            }
         }
     } else if (strcmp(words[0], "USER_OFF") == 0) {
         struct in_addr ip;
