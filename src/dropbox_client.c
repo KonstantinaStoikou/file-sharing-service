@@ -117,6 +117,7 @@ int main(int argc, char const *argv[]) {
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
             printf("Exit!\n");
+            exit(EXIT_FAILURE);
         } else if (err < 0) {
             perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);
