@@ -32,27 +32,25 @@ int main(int argc, char const *argv[]) {
     read_client_arguments(argc, argv, &dirname, &port, &worker_threads_num,
                           &bufsize, &server_port, &server_ip);
 
-    // get clients ip address
-    struct in_addr client_ip = get_client_info();
-
     client.sin_family = AF_INET;  // internet domain
     client.sin_addr.s_addr = htonl(INADDR_ANY);
     client.sin_port = htons(port);
-
-    printf("This Client: Port: %d, Address: %s\n", client.sin_port,
-           inet_ntoa(client_ip));
-
-    char backup_dirname[DIRNAME_SIZE];
-    make_backup_dir(inet_ntoa(client_ip), port, backup_dirname);
 
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
         exit(EXIT_FAILURE);
     }
-
     server.sin_family = AF_INET;  // internet domain
     memcpy(&server.sin_addr, rem_server->h_addr, rem_server->h_length);
     server.sin_port = htons(server_port);
+
+    // get clients ip address
+    struct in_addr client_ip = get_client_info();
+    printf("This Client: Port: %d, Address: %s\n", client.sin_port,
+           inet_ntoa(client_ip));
+    // create directory for this client to store backups of other clients
+    char backup_dirname[DIRNAME_SIZE];
+    make_backup_dir(inet_ntoa(client_ip), port, backup_dirname);
 
     // start new session with server and send LOG_ON message with this client's
     // info
@@ -61,10 +59,10 @@ int main(int argc, char const *argv[]) {
 
     // initialize list to store other clients' info
     List *client_list = initialize_list();
-
     // initialize citcular buffer
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
+    // ask server for client list
     char *client_list_msg = send_getclients_msg(sock);
     // parse client list string
     parse_client_list(client_list_msg, client_list, cb);
@@ -76,12 +74,14 @@ int main(int argc, char const *argv[]) {
     printf("Buffer is: \n");
     print_circ_buf(cb);
 
-    // create struct ith shared variables to pass as argument to threads
+    // create struct with shared variables to pass as argument to threads
     Arg_struct *thr_args = malloc(sizeof(Arg_struct));
     thr_args->cb = cb;
     thr_args->client_list = client_list;
+    strcpy(thr_args->backup_dirname, backup_dirname);
+    pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
     // create worker threads
-    create_n_threads(worker_threads_num, thr_args);
+    create_n_threads(worker_threads_num, thr_args, t_ids);
 
     struct sockaddr_in other_client;
     socklen_t other_clientlen;
@@ -114,6 +114,8 @@ int main(int argc, char const *argv[]) {
                 start_new_session(serverptr, server, clientptr, client);
             send_logoff_msg(serv_sock, port, client_ip, client);
             close(serv_sock);
+            // stop all threads
+            stop_threads(worker_threads_num, t_ids);
             printf("Exit!\n");
             // delete backup directory
             char cmd[] = "rm";

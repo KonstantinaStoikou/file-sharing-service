@@ -17,7 +17,7 @@ TO DO:
 - get file
 - generally break functions to more files
 - make threads start reading from buffer
-- add to thread arguments list the name of the local folder to store backups
 
 READ_ME:
 - request format (how request strings are given in sockets)
+- backup directory structure
