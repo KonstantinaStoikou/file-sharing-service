@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "../include/connection_handlers.h"
@@ -35,33 +36,58 @@ int main(int argc, char const *argv[]) {
 
     int sock = start_listening_port(serverptr, server, port);
 
+    // set of socket descriptors
+    fd_set active_fd_set, read_fd_set;
+    // initialize the set of active sockets
+    FD_ZERO(&active_fd_set);
+    FD_SET(sock, &active_fd_set);
+
     // initialize list to store client info
     List *client_list = initialize_list();
 
     while (1) {
-        // accept connection
-        int newsock;
-        if ((newsock = accept(sock, clientptr, &clientlen)) < 0) {
-            perror(RED "Error while accepting connection" RESET);
+        // block until input arrives on one or more active sockets
+        read_fd_set = active_fd_set;
+        if (select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
+            perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);
         }
 
-        // if server and client are running on the same device, convert private
-        // ip to public ip
-        if (strcmp(inet_ntoa(client.sin_addr), "127.0.0.1") == 0) {
-            memcpy(&client.sin_addr, &server_ip, sizeof(server_ip));
+        // service all the sockets with input pending
+        for (int i = 0; i < FD_SETSIZE; ++i) {
+            if (FD_ISSET(i, &read_fd_set)) {
+                // connection request on original socket
+                if (i == sock) {
+                    // accept connection
+                    int newsock;
+                    if ((newsock = accept(sock, clientptr, &clientlen)) < 0) {
+                        perror(RED "Error while accepting connection" RESET);
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // if server and client are running on the same device,
+                    // convert private ip to public ip
+                    if (strcmp(inet_ntoa(client.sin_addr), "127.0.0.1") == 0) {
+                        memcpy(&client.sin_addr, &server_ip, sizeof(server_ip));
+                    }
+
+                    printf("Client: Port: %d, Address: %s\n", client.sin_port,
+                           inet_ntoa(client.sin_addr));
+                    FD_SET(newsock, &active_fd_set);
+                }
+                // data arriving on an already connected
+                else {
+                    handle_server_connection(i, client_list, client);
+                    // close socket, sock must be closed before it gets
+                    // re-assigned
+                    close(i);
+                    print_list(client_list);
+                    // close socket and clear it to reuse it
+                    close(i);
+                    FD_CLR(i, &active_fd_set);
+                }
+            }
         }
-
-        printf("Client: Port: %d, Address: %s\n", client.sin_port,
-               inet_ntoa(client.sin_addr));
-
-        handle_server_connection(newsock, client_list, client);
-        // close socket, sock must be closed before it gets re-assigned
-        close(newsock);
-
-        print_list(client_list);
     }
-
-    close(sock);
     return 0;
 }
