@@ -22,5 +22,6 @@
 #define TUPLE_BUF_SIZE 100
 // the size of the pathnames of files
 #define PATH_SIZE 128
+#define DIRNAME_SIZE 30
 
 #endif

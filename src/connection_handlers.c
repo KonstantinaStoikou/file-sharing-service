@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../include/defines.h"
+#include "../include/dir_functions.h"
 #include "../include/read_functions.h"
 #include "../include/send_functions.h"
 #include "../include/session_functions.h"

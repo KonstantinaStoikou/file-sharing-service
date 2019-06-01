@@ -11,6 +11,7 @@
 #include "../include/circular_buffer.h"
 #include "../include/connection_handlers.h"
 #include "../include/defines.h"
+#include "../include/dir_functions.h"
 #include "../include/list.h"
 #include "../include/parsing_functions.h"
 #include "../include/read_functions.h"
@@ -40,6 +41,9 @@ int main(int argc, char const *argv[]) {
 
     printf("This Client: Port: %d, Address: %s\n", client.sin_port,
            inet_ntoa(client_ip));
+
+    char backup_dirname[DIRNAME_SIZE];
+    make_backup_dir(inet_ntoa(client_ip), port, backup_dirname);
 
     if ((rem_server = gethostbyname(server_ip)) == NULL) {
         herror(RED "Error in gethostbyname" RESET);
@@ -111,7 +115,10 @@ int main(int argc, char const *argv[]) {
             send_logoff_msg(serv_sock, port, client_ip, client);
             close(serv_sock);
             printf("Exit!\n");
-            exit(EXIT_SUCCESS);
+            // delete backup directory
+            char cmd[] = "rm";
+            char *args[] = {"rm", "-rf", backup_dirname, NULL};
+            execvp(cmd, args);
         } else if (err < 0) {
             perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);
