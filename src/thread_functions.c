@@ -9,14 +9,18 @@ void create_n_threads(int worker_threads_num, Arg_struct *args) {
     pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
     // create worker threads
     for (int i = 0; i < worker_threads_num; i++) {
-        if (pthread_create(&t_ids[i], NULL, do_nothing, (void *)args) != 0) {
+        if (pthread_create(&t_ids[i], NULL, read_from_buffer, (void *)args) !=
+            0) {
             perror(RED "Error while creating threads");
             exit(EXIT_FAILURE);
         }
     }
 }
 
-void *do_nothing(void *args) {
+void *read_from_buffer(void *args) {
+    // read from circular buffer continuously
+    while (1) {
+    }
     print_circ_buf(((Arg_struct *)args)->cb);
     printf("thread %ld\n", pthread_self());
     pthread_exit(NULL);

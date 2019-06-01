@@ -11,11 +11,12 @@ free port numbers:      49152 - 65535
 
 TO DO:
 - see select() function
-- before log_off message, stop threads and reallocate memory
+- before log_off message, stop threads and free memory
 - get file
 - generally break functions to more files
 - make threads start reading from buffer
 - add to thread arguments list the name of the local folder to store backups
+- blocking vs reading when buffer is empty
 
 READ_ME:
 - request format (how request strings are given in sockets)

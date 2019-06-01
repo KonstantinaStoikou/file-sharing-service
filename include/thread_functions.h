@@ -11,7 +11,8 @@ typedef struct Arg_struct {
 
 // Create N worker threads
 void create_n_threads(int worker_threads_num, Arg_struct *args);
-// Test function for threads
-void *do_nothing(void *args);
+// The function that threads will execute, they read continuously from circular
+// buffer until a terminating signal is received
+void *read_from_buffer(void *args);
 
 #endif

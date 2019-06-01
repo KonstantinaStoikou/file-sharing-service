@@ -84,6 +84,7 @@ struct in_addr get_client_info() {
     }
 
     struct in_addr client_addr;
+    // get client ip in network byte order and return it
     client_addr.s_addr = ((struct in_addr *)rem_client->h_addr_list[0])->s_addr;
     return client_addr;
 }
