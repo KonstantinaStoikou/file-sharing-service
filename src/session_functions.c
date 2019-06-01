@@ -10,8 +10,8 @@
 #include <unistd.h>
 #include "../include/defines.h"
 
-int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server,
-                      struct sockaddr *clientptr, struct sockaddr_in client) {
+int create_sock_and_bind(struct sockaddr *serverptr,
+                         struct sockaddr_in server) {
     int sock;
     // create socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -25,11 +25,17 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server,
     }
 
     // bind socket to client address (to certain port of client)
-    if (bind(sock, clientptr, sizeof(client)) < 0) {
+    if (bind(sock, serverptr, sizeof(server)) < 0) {
         perror(RED "Error while binding socket to address" RESET);
         exit(EXIT_FAILURE);
     }
 
+    return sock;
+}
+
+int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server,
+                      struct sockaddr *clientptr, struct sockaddr_in client) {
+    int sock = create_sock_and_bind(clientptr, client);
     // initiate connection
     if (connect(sock, serverptr, sizeof(server)) < 0) {
         perror(RED "Error while connecting" RESET);
@@ -38,26 +44,10 @@ int start_new_session(struct sockaddr *serverptr, struct sockaddr_in server,
     return sock;
 }
 
-int start_listening_port(struct sockaddr *serverptr, struct sockaddr_in server,
-                         int port) {
-    int listen_sock;
+int start_listening_port(struct sockaddr *serverptr,
+                         struct sockaddr_in server) {
+    int listen_sock = create_sock_and_bind(serverptr, server);
 
-    // create socket that this server will listen to
-    if ((listen_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror(RED "Error while creating socket" RESET);
-        exit(EXIT_FAILURE);
-    }
-    // override fails in bind
-    if (setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1},
-                   sizeof(int)) < 0) {
-        perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
-    }
-
-    // bind socket to address
-    if (bind(listen_sock, serverptr, sizeof(server)) < 0) {
-        perror(RED "Error while binding socket to address" RESET);
-        exit(EXIT_FAILURE);
-    }
     // listen for connections
     if (listen(listen_sock, 5) < 0) {
         perror(RED "Error while listening for connections" RESET);

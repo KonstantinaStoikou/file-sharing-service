@@ -88,7 +88,7 @@ int main(int argc, char const *argv[]) {
     struct sockaddr *other_clientptr = (struct sockaddr *)&other_client;
 
     // start listening for requests from other clients or the server
-    int listen_sock = start_listening_port(clientptr, client, port);
+    int listen_sock = start_listening_port(clientptr, client);
 
     // set signal handler
     struct sigaction act;
@@ -117,10 +117,6 @@ int main(int argc, char const *argv[]) {
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
             printf("Exit!\n");
-            // delete backup directory
-            char cmd[] = "rm";
-            char *args[] = {"rm", "-rf", backup_dirname, NULL};
-            execvp(cmd, args);
         } else if (err < 0) {
             perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);

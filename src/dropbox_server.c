@@ -34,7 +34,7 @@ int main(int argc, char const *argv[]) {
     printf("This Server: Port: %d, Address: %s\n", server.sin_port,
            inet_ntoa(server_ip));
 
-    int sock = start_listening_port(serverptr, server, port);
+    int sock = start_listening_port(serverptr, server);
 
     // set of socket descriptors
     fd_set active_fd_set, read_fd_set;
