@@ -78,9 +78,6 @@ int main(int argc, char const *argv[]) {
                 // data arriving on an already connected
                 else {
                     handle_server_connection(i, client_list, client);
-                    // close socket, sock must be closed before it gets
-                    // re-assigned
-                    close(i);
                     print_list(client_list);
                     // close socket and clear it to reuse it
                     close(i);

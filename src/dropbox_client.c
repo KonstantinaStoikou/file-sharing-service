@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "../include/circular_buffer.h"
@@ -91,12 +92,18 @@ int main(int argc, char const *argv[]) {
     act.sa_flags = 0;
     sigaction(SIGINT, &act, NULL);
 
-    while (1) {
-        // accept connection
-        int newsock = accept(listen_sock, other_clientptr, &other_clientlen);
+    // set of socket descriptors
+    fd_set active_fd_set, read_fd_set;
+    // initialize the set of active sockets
+    FD_ZERO(&active_fd_set);
+    FD_SET(sock, &active_fd_set);
 
+    while (1) {
+        // block until input arrives on one or more active sockets
+        read_fd_set = active_fd_set;
+        int err = select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL);
         // check if SIGINT was received
-        if (newsock < 0 && exit_var == 1) {
+        if (err < 0 && exit_var == 1) {
             close(listen_sock);
             // send message LOG_OFF to server
             int serv_sock =
@@ -105,24 +112,43 @@ int main(int argc, char const *argv[]) {
             close(serv_sock);
             printf("Exit!\n");
             exit(EXIT_SUCCESS);
-        }
-        // else if ordinary error was caused display error message
-        else if (newsock < 0) {
-            perror(RED "Error while accepting connection" RESET);
+        } else if (err < 0) {
+            perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);
         }
-        printf("Client: Port: %d, Address: %d\n", htons(other_client.sin_port),
-               other_client.sin_addr.s_addr);
 
-        handle_client_connection(newsock, client_list, other_client, dirname,
-                                 cb);
-        // close socket, sock must be closed before it gets re-assigned
-        close(newsock);
+        // service all the sockets with input pending
+        for (int i = 0; i < FD_SETSIZE; ++i) {
+            if (FD_ISSET(i, &read_fd_set)) {
+                // connection request on original socket
+                if (i == sock) {
+                    // accept connection
+                    int newsock =
+                        accept(listen_sock, other_clientptr, &other_clientlen);
+                    if (newsock < 0) {
+                        perror(RED "Error while accepting connection" RESET);
+                        exit(EXIT_FAILURE);
+                    }
+                    printf("Client: Port: %d, Address: %d\n",
+                           htons(other_client.sin_port),
+                           other_client.sin_addr.s_addr);
 
-        printf("List is: \n");
-        print_list(client_list);
-        printf("Buffer is: \n");
-        print_circ_buf(cb);
+                    FD_SET(newsock, &active_fd_set);
+                }
+                // data arriving on an already connected
+                else {
+                    handle_client_connection(i, client_list, other_client,
+                                             dirname, cb);
+                    printf("List is: \n");
+                    print_list(client_list);
+                    printf("Buffer is: \n");
+                    print_circ_buf(cb);
+                    // close socket and clear it to reuse it
+                    close(i);
+                    FD_CLR(i, &active_fd_set);
+                }
+            }
+        }
     }
 
     return 0;
