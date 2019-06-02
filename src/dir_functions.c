@@ -1,6 +1,7 @@
 #include "../include/dir_functions.h"
 #include <dirent.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include "../include/defines.h"
@@ -18,7 +19,20 @@ void list_files(Pathlist *list, char *dirname) {
         if (dp->d_type == DT_DIR) {
             list_files(list, path);
         } else {
-            add_pathlist_node(list, path);
+            // find md5 hash of file content
+            char cmd[BUF_SIZE];
+            sprintf(cmd, "md5sum %s", path);
+            FILE *fp = popen(cmd, "r");
+            if (fp == NULL) {
+                perror(RED "Error while hashing" RESET);
+                exit(EXIT_FAILURE);
+            }
+            char str[BUF_SIZE];
+            fgets(str, 100, fp);
+            char *md5 = strtok(str, " ");
+            pclose(fp);
+
+            add_pathlist_node(list, path, md5);
         }
     }
     closedir(dir);
@@ -33,3 +47,4 @@ void make_backup_dir(char *clientip_str, int port, char *dirname) {
         mkdir(dirname, 0700);
     }
 }
+void get_md5_hash() {}

@@ -12,14 +12,15 @@ Pathlist *initialize_pathlist(void) {
     return list;
 }
 
-Pathlist_node *add_pathlist_node(Pathlist *list, char *data) {
+Pathlist_node *add_pathlist_node(Pathlist *list, char *path, char *version) {
     // check if node already exists
-    if (search_pathlist_node(list, data) != NULL) {
+    if (search_pathlist_node(list, path) != NULL) {
         return NULL;
     }
     // allocate memory for node
     Pathlist_node *new_node = (Pathlist_node *)malloc(sizeof(Pathlist_node));
-    strcpy(new_node->path, data);
+    strcpy(new_node->path, path);
+    strcpy(new_node->version, version);
     new_node->next = list->head;
     // change head pointer as new node is added at the beginning
     list->head = new_node;
@@ -76,7 +77,7 @@ void print_pathlist(Pathlist *list) {
     Pathlist_node *current = list->head;
 
     while (current != NULL) {
-        printf("%s\n", current->path);
+        printf("%s %s\n", current->path, current->version);
         current = current->next;
     }
 }

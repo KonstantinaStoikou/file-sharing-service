@@ -23,5 +23,7 @@
 // the size of the pathnames of files
 #define PATH_SIZE 128
 #define DIRNAME_SIZE 30
+// the size of md5 hash string
+#define MD5_SIZE 40
 
 #endif

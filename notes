@@ -1,6 +1,6 @@
 NOTES:
-- broadcast vs signal on conditional variables
-- posoi mutex
+- circular buffer full when main thread adds client
+- extra condition variable for when buffer is full
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -12,11 +12,9 @@ free port numbers:      49152 - 65535
 TO DO:
 - before log_off message free memory
 - get file
-- version hash
 - remove unecessary printfs
 - generally break functions to more files
 - thread cancelling problem
-- make new connection in send filelist (to connect to listening port of client, not thread)
 
 READ_ME:
 - request format (how request strings are given in sockets)

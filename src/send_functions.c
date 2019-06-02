@@ -152,7 +152,7 @@ void send_file_list(Pathlist *list, int sockfd) {
 
     while (current != NULL) {
         char temp[FILE_BUF_SIZE];
-        sprintf(temp, "%s ", current->path);
+        sprintf(temp, "%s,%s ", current->path, current->version);
         strcat(response, temp);
 
         current = current->next;
@@ -163,7 +163,6 @@ void send_file_list(Pathlist *list, int sockfd) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
-    printf("Res: %s\n", response);
 }
 
 void send_getfilelist_msg(int sock) {

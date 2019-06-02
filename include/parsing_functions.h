@@ -7,5 +7,7 @@
 // Parse string with client list entries and store them to the list struct and
 // add them as items to circular buffer
 void parse_client_list(char* str, List* list, Circular_buffer* cb);
+// Parse string with file list entries and add them as items to circular buffer
+void parse_file_list(char* str, Circular_buffer* cb);
 
 #endif

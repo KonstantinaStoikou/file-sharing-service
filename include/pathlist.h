@@ -11,6 +11,7 @@
 // A node of the list
 typedef struct Pathlist_node {
     char path[PATH_SIZE];
+    char version[MD5_SIZE];
     struct Pathlist_node *next;
 } Pathlist_node;
 
@@ -24,7 +25,7 @@ typedef struct Pathlist {
 Pathlist *initialize_pathlist(void);
 // Insert new node at the beginning of the list and return the newly added node,
 // if node already exists return NULL
-Pathlist_node *add_pathlist_node(Pathlist *list, char *data);
+Pathlist_node *add_pathlist_node(Pathlist *list, char *path, char *version);
 // Delete a node with the given data, returns 1 if it doesn't exist, else 0
 int delete_pathlist_node(Pathlist *list, char *data);
 // Search for a node with the given data and return it, return NULL if it
