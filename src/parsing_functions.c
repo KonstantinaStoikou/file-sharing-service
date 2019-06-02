@@ -40,7 +40,7 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
             else {
                 Cb_data *data = malloc(sizeof(Cb_data));
                 data->pathname[0] = '\0';
-                data->version = -1;
+                strcpy(data->version, "-1");
                 data->ip_address = ip;
                 data->port_num = port;
                 if (push_back_circ_buf(cb, data) == 1) {
@@ -53,7 +53,8 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
     }
 }
 
-void parse_file_list(char *str, Circular_buffer *cb, char *dirname) {
+void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
+                     struct in_addr ip_address, unsigned short port_num) {
     // message form: FILE_LIST N filepath1,version1 filepath2,version2 ...
     // break message into words
     int count = 0;
@@ -84,9 +85,9 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname) {
                 // file already exists
                 printf("filepath exists: %s\n", filepath);
                 // check if version is the same with already existing file
-                char md5[MD5_SIZE];
-                strcpy(md5, get_md5_hash(filepath));
-                if (strcmp(md5, version) == 0) {
+                char old_md5[MD5_SIZE];
+                strcpy(old_md5, get_md5_hash(filepath));
+                if (strcmp(old_md5, version) == 0) {
                     printf("filepath up to date: %s\n", filepath);
                 } else {
                     printf("filepath not up to date: %s\n", filepath);
@@ -95,20 +96,16 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname) {
             } else {
                 // file doesn't exist
                 printf("filepath not exists: %s\n", filepath);
+                // add to circular buffer
+                Cb_data *data = malloc(sizeof(Cb_data));
+                strcpy(data->pathname, path);
+                strcpy(data->version, version);
+                data->ip_address.s_addr = ip_address.s_addr;
+                data->port_num = port_num;
+                if (push_back_circ_buf(cb, data) == 1) {
+                    printf(RED "Buffer is full, item couldn't be added." RESET);
+                }
             }
-
-            // add it as item to circular buffer
-            // else {
-            //     Cb_data *data = malloc(sizeof(Cb_data));
-            //     data->pathname[0] = '\0';
-            //     data->version = -1;
-            //     data->ip_address = ip;
-            //     data->port_num = port;
-            //     if (push_back_circ_buf(cb, data) == 1) {
-            //         printf(RED "Buffer is full, item couldn't be added."
-            //         RESET);
-            //     }
-            // }
         }
         count++;
         word = strtok_r(NULL, " ", &saveptr_str);

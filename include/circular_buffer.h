@@ -7,6 +7,7 @@
 #define CIRC_BUF_HEADER
 
 #include <netinet/in.h>
+#include "defines.h"
 
 extern pthread_cond_t empty_cond;
 
@@ -21,8 +22,8 @@ typedef struct Circular_buffer {
 } Circular_buffer;
 
 typedef struct Cb_data {
-    char pathname[128];
-    int version;
+    char pathname[PATH_SIZE];
+    char version[MD5_SIZE];
     struct in_addr ip_address;
     unsigned short port_num;
 } Cb_data;

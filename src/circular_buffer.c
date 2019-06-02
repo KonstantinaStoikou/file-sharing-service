@@ -59,7 +59,7 @@ void print_circ_buf(Circular_buffer *cb) {
     while (current != cb->head) {
         Cb_data *item = malloc(sizeof(Cb_data));
         memcpy(item, current, cb->item_size);
-        printf("%d %d %s %d\n", item->ip_address.s_addr, item->port_num,
+        printf("%d %d %s %s\n", item->ip_address.s_addr, item->port_num,
                item->pathname, item->version);
         free(item);
         // get next item

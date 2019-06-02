@@ -1,6 +1,7 @@
 NOTES:
 - circular buffer full when main thread adds client
 - extra condition variable for when buffer is full
+- FILE_UP_TO_DATE pou stelentai?
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu

@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "../include/defines.h"
@@ -51,10 +52,10 @@ void *read_from_buffer(void *args) {
         printf("Thread %ld stopped waiting.\n", pthread_self());
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
-        printf("Item: %d %d %s %d\n", item->ip_address.s_addr, item->port_num,
+        printf("Item: %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
                item->pathname, item->version);
         // if version is -1 then send GET_FILE_LIST to other client
-        if (item->version == -1) {
+        if (strcmp(item->version, "-1") == 0) {
             struct sockaddr_in client;
             struct sockaddr *clientptr = (struct sockaddr *)&client;
             client.sin_family = AF_INET;  // internet domain
@@ -88,7 +89,8 @@ void *read_from_buffer(void *args) {
             if (stat(dirpath, &st) == -1) {
                 mkdir(dirpath, 0700);
             }
-            parse_file_list(msg, cb, dirpath);
+            parse_file_list(msg, cb, dirpath, newsock, client.sin_addr,
+                            client.sin_port);
             close(newsock);
         }
 

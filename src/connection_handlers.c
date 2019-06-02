@@ -105,7 +105,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         else {
             Cb_data *data = malloc(sizeof(Cb_data));
             data->pathname[0] = '\0';
-            data->version = -1;
+            strcpy(data->version, "-1");
             data->ip_address = ip;
             data->port_num = port;
             if (push_back_circ_buf(cb, data) == 1) {
