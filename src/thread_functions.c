@@ -120,6 +120,7 @@ void *read_from_buffer(void *args) {
             }
         }
         close(newsock);
+        free(item);
     }
     pthread_exit(NULL);
 }

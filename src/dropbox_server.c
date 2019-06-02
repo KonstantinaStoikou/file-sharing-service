@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(port);
 
-    printf("This Server: Port: %d, Address: %s\n", server.sin_port,
+    printf("This server has port: %d, address: %s\n", server.sin_port,
            inet_ntoa(server_ip));
 
     int sock = start_listening_port(serverptr, server);
@@ -64,21 +64,16 @@ int main(int argc, char const *argv[]) {
                         perror(RED "Error while accepting connection" RESET);
                         exit(EXIT_FAILURE);
                     }
-
                     // if server and client are running on the same device,
                     // convert private ip to public ip
                     if (strcmp(inet_ntoa(client.sin_addr), "127.0.0.1") == 0) {
                         memcpy(&client.sin_addr, &server_ip, sizeof(server_ip));
                     }
-
-                    printf("Client: Port: %d, Address: %s\n", client.sin_port,
-                           inet_ntoa(client.sin_addr));
                     FD_SET(newsock, &active_fd_set);
                 }
                 // data arriving on an already connected
                 else {
                     handle_server_connection(i, client_list, client);
-                    print_list(client_list);
                     // close socket and clear it to reuse it
                     close(i);
                     FD_CLR(i, &active_fd_set);

@@ -46,7 +46,7 @@ int main(int argc, char const *argv[]) {
 
     // get clients ip address
     struct in_addr client_ip = get_client_info();
-    printf("This Client: Port: %d, Address: %s\n", client.sin_port,
+    printf("This client has port: %d, address: %s\n", ntohs(client.sin_port),
            inet_ntoa(client_ip));
     // create directory for this client to store backups of other clients
     char backup_dirname[DIRNAME_SIZE];
@@ -111,7 +111,7 @@ int main(int argc, char const *argv[]) {
             close(serv_sock);
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
-            printf("Exit!\n");
+            printf(GREEN "Exit.\n" RESET);
             exit(EXIT_SUCCESS);
         } else if (err < 0) {
             perror(RED "Error in select" RED);
@@ -130,10 +130,6 @@ int main(int argc, char const *argv[]) {
                         perror(RED "Error while accepting connection" RESET);
                         exit(EXIT_FAILURE);
                     }
-                    printf("Client: Port: %d, Address: %d\n",
-                           htons(other_client.sin_port),
-                           other_client.sin_addr.s_addr);
-
                     FD_SET(newsock, &active_fd_set);
                 }
                 // data arriving on an already connected

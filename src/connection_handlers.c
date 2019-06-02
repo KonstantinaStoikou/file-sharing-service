@@ -17,7 +17,6 @@ void handle_server_connection(int sockfd, List *list,
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
-    printf("MSG: %s\n", msg);
 
     // break message into words
     char *words[3];  // maximum number of words for a message is 3
@@ -78,7 +77,6 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
     char msg[BUF_SIZE];
     // read message from client
     read_message_from_socket(sockfd, msg, BUF_SIZE);
-    printf("MSG: %s\n", msg);
 
     // break message into words
     char *words[4];  // maximum number of words for a message is 3
@@ -143,6 +141,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         char old_md5[MD5_SIZE];
         strcpy(old_md5, get_md5_hash(filepath));
         if (strcmp(old_md5, version) == 0) {
+            printf("filepath %s up to date\n", filepath);
             if (write(sockfd, "FILE_UP_TO_DATE", ERROR_MSG_SIZE) < 0) {
                 perror(RED "Error writing to socket" RESET);
                 exit(EXIT_FAILURE);
