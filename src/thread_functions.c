@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "../include/defines.h"
 #include "../include/parsing_functions.h"
+#include "../include/read_functions.h"
 #include "../include/send_functions.h"
 #include "../include/session_functions.h"
 
@@ -75,12 +76,11 @@ void *read_from_buffer(void *args) {
         if (strcmp(item->version, "-1") == 0) {
             send_getfilelist_msg(newsock);
             char msg[FILE_LIST_SIZE];
-            // read message from socket
+            // read_message_from_socket(newsock, msg, FILE_LIST_SIZE);
             if (read(newsock, msg, FILE_LIST_SIZE) < 0) {
-                perror(RED "Error reading from socket" RESET);
+                perror(RED "Error readingg1 from socket" RESET);
                 exit(EXIT_FAILURE);
             }
-
             printf("Message: %s\n", msg);
             // form backup subdirectory path for this client
             char dirpath[DIRPATH_SIZE];
@@ -96,8 +96,14 @@ void *read_from_buffer(void *args) {
         }
         // else send GET_FILE to other client
         else {
-            printf("We need to send get file request!\n");
             send_getfile_msg(newsock, item->pathname, item->version);
+            char msg[FILE_BYTES_SIZE];
+            // read_message_from_socket(newsock, msg, FILE_BYTES_SIZE);
+            if (read(newsock, msg, FILE_BYTES_SIZE) < 0) {
+                perror(RED "Error readingg2 from socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            printf("File: %s\n", msg);
         }
         close(newsock);
 

@@ -81,7 +81,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
     printf("MSG: %s\n", msg);
 
     // break message into words
-    char *words[3];  // maximum number of words for a message is 2
+    char *words[4];  // maximum number of words for a message is 3
     int count = 0;
     char *word = strtok(msg, " ");  // split message by spaces
     while (word) {
@@ -128,6 +128,29 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         list_files(list, dirname);
         send_file_list(list, sockfd);
     } else if (strcmp(words[0], "GET_FILE") == 0) {
+        char filepath[PATH_SIZE];
+        strcpy(filepath, words[1]);
+        char version[MD5_SIZE];
+        strcpy(version, words[2]);
+        // check if file exists
+        if (access(filepath, F_OK) == -1) {
+            if (write(sockfd, "FILE_NOT_FOUND", ERROR_MSG_SIZE) < 0) {
+                perror(RED "Error writing to socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+        }
+        // check if version is the same with already existing file
+        char old_md5[MD5_SIZE];
+        strcpy(old_md5, get_md5_hash(filepath));
+        if (strcmp(old_md5, version) == 0) {
+            if (write(sockfd, "FILE_UP_TO_DATE", ERROR_MSG_SIZE) < 0) {
+                perror(RED "Error writing to socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            printf("sending file\n");
+            send_file_msg(sockfd, filepath, version);
+        }
         // Pathlist *list = initialize_pathlist();
         // list_files(list, dirname);
         // send_file_list(list, sockfd);

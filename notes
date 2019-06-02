@@ -14,6 +14,7 @@ TO DO:
 - before log_off message free memory
 - send file back
 - remove unecessary printfs
+- send correctly error messages to clients/servers
 - generally break functions to more files
 - thread cancelling problem
 

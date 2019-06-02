@@ -26,5 +26,7 @@ void send_file_list(Pathlist* list, int sockfd);
 void send_getfilelist_msg(int sock);
 // Send a GET_FILE message to socket
 void send_getfile_msg(int sock, char* path, char* version);
+// Send a file to socket
+void send_file_msg(int sock, char* path, char* version);
 
 #endif

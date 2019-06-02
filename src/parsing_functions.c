@@ -78,25 +78,12 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
                 token = strtok_r(NULL, ",", &saveptr_word);
             }
             // check if this file already exists in backup subdirectory
-            printf("Checking file: %s %s\n", path, version);
             char filepath[DIRPATH_SIZE + PATH_SIZE];
             sprintf(filepath, "%s/%s", dirname, path);
             if (access(filepath, F_OK) != -1) {
                 // file already exists
                 // add to circular buffer
                 add_file_to_buffer(cb, path, version, ip_address, port_num);
-                // printf("filepath exists: %s\n", filepath);
-                // // check if version is the same with already existing file
-                // char old_md5[MD5_SIZE];
-                // strcpy(old_md5, get_md5_hash(filepath));
-                // if (strcmp(old_md5, version) == 0) {
-                //     printf("filepath up to date: %s\n", filepath);
-                // } else {
-                //     // add to circular buffer
-                //     add_file_to_buffer(cb, path, version, ip_address,
-                //     port_num);
-                // }
-
             } else {
                 // file doesn't exist
                 // add to circular buffer

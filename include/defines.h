@@ -18,6 +18,8 @@
 #define FILE_LIST_SIZE 10000
 // the size of the buffer for a file-version tuple
 #define FILE_BUF_SIZE 200
+// the size of the buffer for a file content
+#define FILE_BYTES_SIZE 10000
 // the size of the buffer for a simple tuple
 #define TUPLE_BUF_SIZE 100
 // the size of the pathnames of files
@@ -26,5 +28,7 @@
 #define DIRPATH_SIZE 2 * DIRNAME_SIZE
 // the size of md5 hash string
 #define MD5_SIZE 40
+// the size of an error message
+#define ERROR_MSG_SIZE 30
 
 #endif
