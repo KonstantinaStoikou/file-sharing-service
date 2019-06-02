@@ -1,6 +1,5 @@
 NOTES:
 - circular buffer full when main thread adds client
-- FILE_UP_TO_DATE pou stelentai?
 - pano apo parse file list vazo condition variable gia full buffer
 
 TERMINAL COMMANDS:
@@ -12,7 +11,6 @@ free port numbers:      49152 - 65535
 
 TO DO:
 - before log_off message free memory
-- send file back
 - remove unecessary printfs
 - send correctly error messages to clients/servers
 - generally break functions to more files

@@ -81,11 +81,6 @@ int main(int argc, char const *argv[]) {
     free(client_list_msg);
     close(sock);
 
-    printf("List is: \n");
-    print_list(client_list);
-    printf("Buffer is: \n");
-    print_circ_buf(cb);
-
     struct sockaddr_in other_client;
     socklen_t other_clientlen;
     struct sockaddr *other_clientptr = (struct sockaddr *)&other_client;
@@ -145,10 +140,6 @@ int main(int argc, char const *argv[]) {
                 else {
                     handle_client_connection(i, client_list, other_client,
                                              dirname, cb);
-                    printf("List is: \n");
-                    print_list(client_list);
-                    printf("Buffer is: \n");
-                    print_circ_buf(cb);
                     // close socket and clear it to reuse it
                     close(i);
                     FD_CLR(i, &active_fd_set);

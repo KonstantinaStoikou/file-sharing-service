@@ -48,9 +48,7 @@ void *read_from_buffer(void *args) {
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        printf("Thread %ld waiting...\n", pthread_self());
         pthread_cond_wait(&empty_cond, &buf_mutex);
-        printf("Thread %ld stopped waiting.\n", pthread_self());
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
         printf("Item: %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
@@ -77,7 +75,6 @@ void *read_from_buffer(void *args) {
             send_getfilelist_msg(newsock);
             char msg[FILE_LIST_SIZE];
             read_message_from_socket(newsock, msg, FILE_LIST_SIZE);
-            printf("Message: %s\n", msg);
             // form backup subdirectory path for this client
             char dirpath[DIRPATH_SIZE];
             sprintf(dirpath, "%s/%s_%d/", ((Arg_struct *)args)->backup_dirname,
@@ -98,7 +95,6 @@ void *read_from_buffer(void *args) {
                 perror(RED "Error reading from socket" RESET);
                 exit(EXIT_FAILURE);
             }
-            printf("File: %s\n", msg);
             char file_cont[FILE_BYTES_SIZE];
             // if a file was written in socket, create it
             if (parse_file(msg, file_cont) == 0) {
@@ -108,13 +104,11 @@ void *read_from_buffer(void *args) {
                         ((Arg_struct *)args)->backup_dirname,
                         inet_ntoa(client.sin_addr), ntohs(client.sin_port),
                         item->pathname);
-                printf("filepath: %s\n", filepath);
                 char cmd[BUF_SIZE];
                 char filepath_copy[BUF_SIZE];
                 strcpy(filepath_copy, filepath);
                 sprintf(cmd, "mkdir -p %s && touch %s", dirname(filepath_copy),
                         filepath);
-                printf("cmd: %s\n", cmd);
                 // execute mkdir and touch
                 system(cmd);
                 // write file contents to file
