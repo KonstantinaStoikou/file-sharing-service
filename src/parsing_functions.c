@@ -91,23 +91,31 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
                     printf("filepath up to date: %s\n", filepath);
                 } else {
                     printf("filepath not up to date: %s\n", filepath);
+                    // add to circular buffer
+                    add_file_to_buffer(cb, path, version, ip_address, port_num);
                 }
 
             } else {
                 // file doesn't exist
                 printf("filepath not exists: %s\n", filepath);
                 // add to circular buffer
-                Cb_data *data = malloc(sizeof(Cb_data));
-                strcpy(data->pathname, path);
-                strcpy(data->version, version);
-                data->ip_address.s_addr = ip_address.s_addr;
-                data->port_num = port_num;
-                if (push_back_circ_buf(cb, data) == 1) {
-                    printf(RED "Buffer is full, item couldn't be added." RESET);
-                }
+                add_file_to_buffer(cb, path, version, ip_address, port_num);
             }
         }
         count++;
         word = strtok_r(NULL, " ", &saveptr_str);
+    }
+}
+
+void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
+                        struct in_addr ip_address, unsigned short port_num) {
+    // add to circular buffer
+    Cb_data *data = malloc(sizeof(Cb_data));
+    strcpy(data->pathname, path);
+    strcpy(data->version, version);
+    data->ip_address.s_addr = ip_address.s_addr;
+    data->port_num = port_num;
+    if (push_back_circ_buf(cb, data) == 1) {
+        printf(RED "Buffer is full, item couldn't be added." RESET);
     }
 }
