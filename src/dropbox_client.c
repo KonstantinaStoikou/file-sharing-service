@@ -70,9 +70,6 @@ int main(int argc, char const *argv[]) {
     thr_args->cb = cb;
     thr_args->client_list = client_list;
     strcpy(thr_args->backup_dirname, backup_dirname);
-    thr_args->this_ip = client_ip;
-    thr_args->this_port = client.sin_port;
-    thr_args->sock = listen_sock;
     pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
     // create worker threads
     create_n_threads(worker_threads_num, thr_args, t_ids);
