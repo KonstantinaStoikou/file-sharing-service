@@ -62,6 +62,9 @@ int main(int argc, char const *argv[]) {
     // initialize citcular buffer
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
 
+    // start listening for requests from other clients or the server
+    int listen_sock = start_listening_port(clientptr, client);
+
     // create struct with shared variables to pass as argument to threads
     Arg_struct *thr_args = malloc(sizeof(Arg_struct));
     thr_args->cb = cb;
@@ -69,6 +72,7 @@ int main(int argc, char const *argv[]) {
     strcpy(thr_args->backup_dirname, backup_dirname);
     thr_args->this_ip = client_ip;
     thr_args->this_port = client.sin_port;
+    thr_args->sock = listen_sock;
     pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
     // create worker threads
     create_n_threads(worker_threads_num, thr_args, t_ids);
@@ -89,9 +93,6 @@ int main(int argc, char const *argv[]) {
     socklen_t other_clientlen;
     struct sockaddr *other_clientptr = (struct sockaddr *)&other_client;
 
-    // start listening for requests from other clients or the server
-    int listen_sock = start_listening_port(clientptr, client);
-
     // set signal handler
     struct sigaction act;
     act.sa_handler = exit_action;
@@ -102,7 +103,7 @@ int main(int argc, char const *argv[]) {
     fd_set active_fd_set, read_fd_set;
     // initialize the set of active sockets
     FD_ZERO(&active_fd_set);
-    FD_SET(sock, &active_fd_set);
+    FD_SET(listen_sock, &active_fd_set);
 
     while (1) {
         // block until input arrives on one or more active sockets
@@ -129,7 +130,7 @@ int main(int argc, char const *argv[]) {
         for (int i = 0; i < FD_SETSIZE; ++i) {
             if (FD_ISSET(i, &read_fd_set)) {
                 // connection request on original socket
-                if (i == sock) {
+                if (i == listen_sock) {
                     // accept connection
                     int newsock =
                         accept(listen_sock, other_clientptr, &other_clientlen);

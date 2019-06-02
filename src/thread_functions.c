@@ -59,36 +59,25 @@ void *read_from_buffer(void *args) {
             struct sockaddr_in this_client;
             struct sockaddr *this_clientptr = (struct sockaddr *)&this_client;
             this_client.sin_family = AF_INET;  // internet domain
-            this_client.sin_addr = ((Arg_struct *)args)->this_ip;
+            this_client.sin_addr.s_addr = htonl(INADDR_ANY);
             this_client.sin_port = ((Arg_struct *)args)->this_port;
             printf("%d %d\n", client.sin_addr.s_addr, client.sin_port);
+            printf("this: %d %d\n", this_client.sin_addr.s_addr,
+                   this_client.sin_port);
 
-            // int newsock = start_new_session(clientptr, client,
-            // this_clientptr,
-            //                                 this_client);
-
+            // int newsock = ((Arg_struct *)args)->sock;
             int newsock;
-            // create socket
             if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
                 perror(RED "Error while creating socket" RESET);
                 exit(EXIT_FAILURE);
             }
-            // override fails in bind
-            // if (setsockopt(newsock, SOL_SOCKET, SO_REUSEADDR, &(int){1},
-            //                sizeof(int)) < 0) {
-            //     perror(RED "Error in setsockopt(SO_REUSEADDR)" RESET);
-            // }
-            // bind socket to client address (to certain port of client)
-            // if (bind(newsock, this_clientptr, sizeof(this_client)) < 0) {
-            //     perror(RED "Error while binding socket to address" RESET);
-            //     exit(EXIT_FAILURE);
-            // }
             if (connect(newsock, clientptr, sizeof(client)) < 0) {
-                perror(RED "Error while conneecting" RESET);
+                perror(RED "Error while connecting" RESET);
                 exit(EXIT_FAILURE);
             }
-
+            printf("hi before\n");
             send_getfilelist_msg(newsock);
+            printf("hi after\n");
             char msg[BUF_SIZE];
             // read message from socket
             if (read(newsock, msg, BUF_SIZE) < 0) {
@@ -97,7 +86,7 @@ void *read_from_buffer(void *args) {
             }
 
             printf("Message: %s\n", msg);
-            close(newsock);
+            // close(newsock);
         }
 
         // pthread_mutex_unlock(&buf_mutex);
