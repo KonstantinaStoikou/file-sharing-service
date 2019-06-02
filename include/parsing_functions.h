@@ -13,6 +13,8 @@ void parse_file_list(char* str, Circular_buffer* cb, char* dirname, int sock,
                      struct in_addr ip_address, unsigned short port_num);
 void add_file_to_buffer(Circular_buffer* cb, char* path, char* version,
                         struct in_addr ip_address, unsigned short port_num);
-void parse_file(char* str);
+// Parse a FILE_SIZE message and return contents of file to file_cont, if no
+// file was send in message return 1, else return 0
+int parse_file(char* str, char* file_cont);
 
 #endif

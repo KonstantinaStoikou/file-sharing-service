@@ -108,15 +108,18 @@ void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
     }
 }
 
-void parse_file(char *str) {
+int parse_file(char *str, char *file_cont) {
     // message form: FILE_SIZE version n byte0byte1...byten
     // break message into words
-    char *words[4];  // maximum number of words for a message is 4
+    char *words[4];  // maximum number of words for this message is 4
     words[0] = strtok(str, " ");
     words[1] = strtok(NULL, " ");
     words[2] = strtok(NULL, " ");
     words[3] = strtok(NULL, "");
-    for (int i = 0; i < 4; i++) {
-        printf("words %d: %s\n", i, words[i]);
+    if (strcmp(words[0], "FILE_SIZE") == 0) {
+        strcpy(file_cont, words[3]);
+        return 0;
+    } else {
+        return 1;
     }
 }

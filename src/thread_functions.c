@@ -1,5 +1,6 @@
 #include "../include/thread_functions.h"
 #include <arpa/inet.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,7 +99,31 @@ void *read_from_buffer(void *args) {
                 exit(EXIT_FAILURE);
             }
             printf("File: %s\n", msg);
-            parse_file(msg);
+            char file_cont[FILE_BYTES_SIZE];
+            // if a file was written in socket, create it
+            if (parse_file(msg, file_cont) == 0) {
+                // form backup subdirectory path for this client
+                char filepath[BUF_SIZE];
+                sprintf(filepath, "%s/%s_%d/%s",
+                        ((Arg_struct *)args)->backup_dirname,
+                        inet_ntoa(client.sin_addr), ntohs(client.sin_port),
+                        item->pathname);
+                printf("filepath: %s\n", filepath);
+                char cmd[BUF_SIZE];
+                char filepath_copy[BUF_SIZE];
+                strcpy(filepath_copy, filepath);
+                sprintf(cmd, "mkdir -p %s && touch %s", dirname(filepath_copy),
+                        filepath);
+                printf("cmd: %s\n", cmd);
+                // execute mkdir and touch
+                system(cmd);
+                // write file contents to file
+                FILE *fp = fopen(filepath, "ab");
+                if (fp != NULL) {
+                    fputs(file_cont, fp);
+                    fclose(fp);
+                }
+            }
         }
         close(newsock);
     }
