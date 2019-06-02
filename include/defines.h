@@ -15,14 +15,15 @@
 // the size of the buffer for the message CLIENT_LIST
 #define CLIENT_LIST_SIZE 1000
 // the size of the buffer for the message FILE_LIST
-#define FILE_LIST_SIZE 1000
+#define FILE_LIST_SIZE 10000
 // the size of the buffer for a file-version tuple
 #define FILE_BUF_SIZE 200
 // the size of the buffer for a simple tuple
 #define TUPLE_BUF_SIZE 100
 // the size of the pathnames of files
 #define PATH_SIZE 128
-#define DIRNAME_SIZE 30
+#define DIRNAME_SIZE 50
+#define DIRPATH_SIZE 2 * DIRNAME_SIZE
 // the size of md5 hash string
 #define MD5_SIZE 40
 

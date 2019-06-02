@@ -8,6 +8,7 @@
 // add them as items to circular buffer
 void parse_client_list(char* str, List* list, Circular_buffer* cb);
 // Parse string with file list entries and add them as items to circular buffer
-void parse_file_list(char* str, Circular_buffer* cb);
+// (after comparing versions)
+void parse_file_list(char* str, Circular_buffer* cb, char* dirname);
 
 #endif

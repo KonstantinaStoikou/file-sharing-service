@@ -8,5 +8,7 @@ void list_files(Pathlist *list, char *dirname);
 // Create directory to store the backup and return the name of the directory in
 // the variable
 void make_backup_dir(char *clientip_str, int port, char *dirname);
+// Return md5 hash of a file content
+char *get_md5_hash(char *path);
 
 #endif
