@@ -16,6 +16,7 @@ TO DO:
 - remove unecessary printfs
 - generally break functions to more files
 - thread cancelling problem
+- make new connection in send filelist (to connect to listening port of client, not thread)
 
 READ_ME:
 - request format (how request strings are given in sockets)
