@@ -24,5 +24,7 @@ void send_useroff_msg(List* list, Tuple tup);
 void send_file_list(Pathlist* list, int sockfd);
 // Send a GET_FILE_LIST message to socket
 void send_getfilelist_msg(int sock);
+// Send a GET_FILE message to socket
+void send_getfile_msg(int sock, char* path, char* version);
 
 #endif

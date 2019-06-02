@@ -83,23 +83,24 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
             sprintf(filepath, "%s/%s", dirname, path);
             if (access(filepath, F_OK) != -1) {
                 // file already exists
-                printf("filepath exists: %s\n", filepath);
-                // check if version is the same with already existing file
-                char old_md5[MD5_SIZE];
-                strcpy(old_md5, get_md5_hash(filepath));
-                if (strcmp(old_md5, version) == 0) {
-                    printf("filepath up to date: %s\n", filepath);
-                } else {
-                    printf("filepath not up to date: %s\n", filepath);
-                    // add to circular buffer
-                    add_file_to_buffer(cb, path, version, ip_address, port_num);
-                }
+                // add to circular buffer
+                add_file_to_buffer(cb, path, version, ip_address, port_num);
+                // printf("filepath exists: %s\n", filepath);
+                // // check if version is the same with already existing file
+                // char old_md5[MD5_SIZE];
+                // strcpy(old_md5, get_md5_hash(filepath));
+                // if (strcmp(old_md5, version) == 0) {
+                //     printf("filepath up to date: %s\n", filepath);
+                // } else {
+                //     // add to circular buffer
+                //     add_file_to_buffer(cb, path, version, ip_address,
+                //     port_num);
+                // }
 
             } else {
                 // file doesn't exist
-                printf("filepath not exists: %s\n", filepath);
                 // add to circular buffer
-                add_file_to_buffer(cb, path, version, ip_address, port_num);
+                add_file_to_buffer(cb, path, "0", ip_address, port_num);
             }
         }
         count++;

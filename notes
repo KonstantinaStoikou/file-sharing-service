@@ -1,7 +1,7 @@
 NOTES:
 - circular buffer full when main thread adds client
-- extra condition variable for when buffer is full
 - FILE_UP_TO_DATE pou stelentai?
+- pano apo parse file list vazo condition variable gia full buffer
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -12,7 +12,7 @@ free port numbers:      49152 - 65535
 
 TO DO:
 - before log_off message free memory
-- get file
+- send file back
 - remove unecessary printfs
 - generally break functions to more files
 - thread cancelling problem
@@ -21,3 +21,4 @@ READ_ME:
 - request format (how request strings are given in sockets)
 - backup directory structure
 - how pathnames are initialized in buffer
+- version 0 when file doesn't exist, -1 when tuple without file

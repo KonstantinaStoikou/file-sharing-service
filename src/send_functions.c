@@ -173,3 +173,12 @@ void send_getfilelist_msg(int sock) {
         exit(EXIT_FAILURE);
     }
 }
+
+void send_getfile_msg(int sock, char *path, char *version) {
+    char msg[BUF_SIZE + PATH_SIZE];
+    sprintf(msg, "GET_FILE %s %s", path, version);
+    if (write(sock, msg, BUF_SIZE + PATH_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
+}

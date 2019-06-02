@@ -54,23 +54,25 @@ void *read_from_buffer(void *args) {
         pop_front_circ_buf(cb, item);
         printf("Item: %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
                item->pathname, item->version);
+
+        // connect to client
+        struct sockaddr_in client;
+        struct sockaddr *clientptr = (struct sockaddr *)&client;
+        client.sin_family = AF_INET;  // internet domain
+        client.sin_addr = item->ip_address;
+        client.sin_port = item->port_num;
+
+        int newsock;
+        if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            perror(RED "Error while creating socket" RESET);
+            exit(EXIT_FAILURE);
+        }
+        if (connect(newsock, clientptr, sizeof(client)) < 0) {
+            perror(RED "Error while connecting" RESET);
+            exit(EXIT_FAILURE);
+        }
         // if version is -1 then send GET_FILE_LIST to other client
         if (strcmp(item->version, "-1") == 0) {
-            struct sockaddr_in client;
-            struct sockaddr *clientptr = (struct sockaddr *)&client;
-            client.sin_family = AF_INET;  // internet domain
-            client.sin_addr = item->ip_address;
-            client.sin_port = item->port_num;
-
-            int newsock;
-            if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-                perror(RED "Error while creating socket" RESET);
-                exit(EXIT_FAILURE);
-            }
-            if (connect(newsock, clientptr, sizeof(client)) < 0) {
-                perror(RED "Error while connecting" RESET);
-                exit(EXIT_FAILURE);
-            }
             send_getfilelist_msg(newsock);
             char msg[FILE_LIST_SIZE];
             // read message from socket
@@ -91,8 +93,13 @@ void *read_from_buffer(void *args) {
             }
             parse_file_list(msg, cb, dirpath, newsock, client.sin_addr,
                             client.sin_port);
-            close(newsock);
         }
+        // else send GET_FILE to other client
+        else {
+            printf("We need to send get file request!\n");
+            send_getfile_msg(newsock, item->pathname, item->version);
+        }
+        close(newsock);
 
         // pthread_mutex_unlock(&buf_mutex);
     }

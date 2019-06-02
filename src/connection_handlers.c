@@ -127,5 +127,9 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         Pathlist *list = initialize_pathlist();
         list_files(list, dirname);
         send_file_list(list, sockfd);
+    } else if (strcmp(words[0], "GET_FILE") == 0) {
+        // Pathlist *list = initialize_pathlist();
+        // list_files(list, dirname);
+        // send_file_list(list, sockfd);
     }
 }
