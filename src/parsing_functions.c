@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "../include/defines.h"
+#include "../include/dir_functions.h"
 
 void parse_client_list(char *str, List *list, Circular_buffer *cb) {
     // message form: CLIENT_LIST N ip1,port1 ip2,port2 ip3,port3 ...
@@ -74,9 +76,27 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname) {
                 }
                 token = strtok_r(NULL, ",", &saveptr_word);
             }
-            // check if this file already exists in backup
+            // check if this file already exists in backup subdirectory
             printf("Checking file: %s %s\n", path, version);
-            // check if version is the same with already existing file
+            char filepath[DIRPATH_SIZE + PATH_SIZE];
+            sprintf(filepath, "%s/%s", dirname, path);
+            if (access(filepath, F_OK) != -1) {
+                // file already exists
+                printf("filepath exists: %s\n", filepath);
+                // check if version is the same with already existing file
+                char md5[MD5_SIZE];
+                strcpy(md5, get_md5_hash(filepath));
+                if (strcmp(md5, version) == 0) {
+                    printf("filepath up to date: %s\n", filepath);
+                } else {
+                    printf("filepath not up to date: %s\n", filepath);
+                }
+
+            } else {
+                // file doesn't exist
+                printf("filepath not exists: %s\n", filepath);
+            }
+
             // add it as item to circular buffer
             // else {
             //     Cb_data *data = malloc(sizeof(Cb_data));

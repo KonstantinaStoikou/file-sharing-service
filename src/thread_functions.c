@@ -88,7 +88,6 @@ void *read_from_buffer(void *args) {
             if (stat(dirpath, &st) == -1) {
                 mkdir(dirpath, 0700);
             }
-            printf("Dirpath: %s\n", dirpath);
             parse_file_list(msg, cb, dirpath);
             close(newsock);
         }

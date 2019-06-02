@@ -1,0 +1,18 @@
+NOTES:
+
+- client has ip address 127.0.0.1 -> loopback address can't be used in other computers
+- pou ginetai to copy? se poion fakelo? (clientName/pathname -> pou vrisketai?)
+- ti grafoume ston buffer?
+    - isos ta tuples tis listas me ta client info
+- ta threads moirazontai kikliko buffer kai lista
+
+TERMINAL COMMANDS:
+check listening ports:  sudo ss -lntu
+send message to server: echo "hello" | nc 127.0.0.1 8888
+free port numbers:      49152 - 65535
+
+./dropbox_client -d
+
+
+READ_ME:
+- request format (how request strings are givn in sockets)
