@@ -13,5 +13,6 @@ void parse_file_list(char* str, Circular_buffer* cb, char* dirname, int sock,
                      struct in_addr ip_address, unsigned short port_num);
 void add_file_to_buffer(Circular_buffer* cb, char* path, char* version,
                         struct in_addr ip_address, unsigned short port_num);
+void parse_file(char* str);
 
 #endif

@@ -148,11 +148,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
                 exit(EXIT_FAILURE);
             }
         } else {
-            printf("sending file\n");
             send_file_msg(sockfd, filepath, version);
         }
-        // Pathlist *list = initialize_pathlist();
-        // list_files(list, dirname);
-        // send_file_list(list, sockfd);
     }
 }

@@ -107,3 +107,16 @@ void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
         printf(RED "Buffer is full, item couldn't be added." RESET);
     }
 }
+
+void parse_file(char *str) {
+    // message form: FILE_SIZE version n byte0byte1...byten
+    // break message into words
+    char *words[4];  // maximum number of words for a message is 4
+    words[0] = strtok(str, " ");
+    words[1] = strtok(NULL, " ");
+    words[2] = strtok(NULL, " ");
+    words[3] = strtok(NULL, "");
+    for (int i = 0; i < 4; i++) {
+        printf("words %d: %s\n", i, words[i]);
+    }
+}

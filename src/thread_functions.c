@@ -47,7 +47,6 @@ void *read_from_buffer(void *args) {
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        // pthread_mutex_lock(&buf_mutex);
         printf("Thread %ld waiting...\n", pthread_self());
         pthread_cond_wait(&empty_cond, &buf_mutex);
         printf("Thread %ld stopped waiting.\n", pthread_self());
@@ -76,11 +75,7 @@ void *read_from_buffer(void *args) {
         if (strcmp(item->version, "-1") == 0) {
             send_getfilelist_msg(newsock);
             char msg[FILE_LIST_SIZE];
-            // read_message_from_socket(newsock, msg, FILE_LIST_SIZE);
-            if (read(newsock, msg, FILE_LIST_SIZE) < 0) {
-                perror(RED "Error readingg1 from socket" RESET);
-                exit(EXIT_FAILURE);
-            }
+            read_message_from_socket(newsock, msg, FILE_LIST_SIZE);
             printf("Message: %s\n", msg);
             // form backup subdirectory path for this client
             char dirpath[DIRPATH_SIZE];
@@ -98,16 +93,14 @@ void *read_from_buffer(void *args) {
         else {
             send_getfile_msg(newsock, item->pathname, item->version);
             char msg[FILE_BYTES_SIZE];
-            // read_message_from_socket(newsock, msg, FILE_BYTES_SIZE);
             if (read(newsock, msg, FILE_BYTES_SIZE) < 0) {
-                perror(RED "Error readingg2 from socket" RESET);
+                perror(RED "Error reading from socket" RESET);
                 exit(EXIT_FAILURE);
             }
             printf("File: %s\n", msg);
+            parse_file(msg);
         }
         close(newsock);
-
-        // pthread_mutex_unlock(&buf_mutex);
     }
     pthread_exit(NULL);
 }
