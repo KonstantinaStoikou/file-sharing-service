@@ -12,8 +12,8 @@ typedef struct Arg_struct {
     Circular_buffer *cb;
     List *client_list;
     char backup_dirname[DIRNAME_SIZE];
-    struct in_addr this_ip_address;
-    unsigned short this_port_num;
+    struct in_addr this_ip;
+    unsigned short this_port;
 } Arg_struct;
 
 // Create N worker threads

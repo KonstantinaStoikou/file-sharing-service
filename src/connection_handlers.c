@@ -124,10 +124,9 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
     } else if (strcmp(words[0], "GET_FILE_LIST") == 0) {
-        printf("ASKED FOR FILE LIST\n");
-        // Pathlist *list = initialize_pathlist();
-        // list_files(list, dirname);
-        // send_file_list(list, sockfd);
+        Pathlist *list = initialize_pathlist();
+        list_files(list, dirname);
+        send_file_list(list, sockfd);
         // print_pathlist(list);
     }
 }

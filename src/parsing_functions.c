@@ -39,7 +39,7 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
             else {
                 Cb_data *data = malloc(sizeof(Cb_data));
                 data->pathname[0] = '\0';
-                data->version = 0;
+                data->version = -1;
                 data->ip_address = ip;
                 data->port_num = port;
                 if (push_back_circ_buf(cb, data) == 1) {

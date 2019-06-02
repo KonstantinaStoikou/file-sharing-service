@@ -28,10 +28,10 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
             exit(EXIT_FAILURE);
         }
         printf("Thread %ld cancelled\n", t_ids[i]);
-        if (pthread_join(t_ids[i], NULL) != 0) {
-            perror(RED "Error while waiting for threads to terminate" RESET);
-            exit(EXIT_FAILURE);
-        }
+        // if (pthread_join(t_ids[i], NULL) != 0) {
+        //     perror(RED "Error while waiting for threads to terminate" RESET);
+        //     exit(EXIT_FAILURE);
+        // }
     }
 }
 
@@ -56,17 +56,16 @@ void *read_from_buffer(void *args) {
             client.sin_family = AF_INET;  // internet domain
             client.sin_addr = item->ip_address;
             client.sin_port = item->port_num;
+            struct sockaddr_in this_client;
+            struct sockaddr *this_clientptr = (struct sockaddr *)&this_client;
+            this_client.sin_family = AF_INET;  // internet domain
+            this_client.sin_addr = ((Arg_struct *)args)->this_ip;
+            this_client.sin_port = ((Arg_struct *)args)->this_port;
+            printf("%d %d\n", this_client.sin_addr.s_addr,
+                   this_client.sin_port);
 
-            int newsock;
-            // create socket
-            if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-                perror(RED "Error while creating socket" RESET);
-                exit(EXIT_FAILURE);
-            }
-            if (connect(newsock, clientptr, sizeof(client)) < 0) {
-                perror(RED "Error while connecting" RESET);
-                exit(EXIT_FAILURE);
-            }
+            int newsock = start_new_session(clientptr, client, this_clientptr,
+                                            this_client);
             send_getfilelist_msg(newsock);
             close(newsock);
         }
