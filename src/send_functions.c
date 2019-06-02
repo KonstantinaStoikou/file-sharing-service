@@ -11,7 +11,7 @@
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
 
-void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
+void send_logon_msg(int sockfd, struct in_addr client_ip,
                     struct sockaddr_in client) {
     // inform server that this new client has arrived
     char msg[BUF_SIZE];
@@ -22,8 +22,7 @@ void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
     }
 }
 
-void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
-                     struct sockaddr_in client) {
+void send_logoff_msg(int sockfd) {
     // inform server that this client has exited
     char msg[BUF_SIZE];
     strcpy(msg, "LOG_OFF");
@@ -165,4 +164,13 @@ void send_file_list(Pathlist *list, int sockfd) {
         exit(EXIT_FAILURE);
     }
     printf("Res: %s\n", response);
+}
+
+void send_getfilelist_msg(int sock) {
+    char msg[BUF_SIZE];
+    strcpy(msg, "GET_FILE_LIST");
+    if (write(sock, msg, BUF_SIZE) < 0) {
+        perror(RED "Error writing to socket" RESET);
+        exit(EXIT_FAILURE);
+    }
 }

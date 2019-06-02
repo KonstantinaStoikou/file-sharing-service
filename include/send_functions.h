@@ -6,11 +6,10 @@
 #include "../include/pathlist.h"
 
 // Send a LOG_ON message to server
-void send_logon_msg(int sockfd, int port, struct in_addr client_ip,
+void send_logon_msg(int sockfd, struct in_addr client_ip,
                     struct sockaddr_in client);
 // Send a LOG_OFF message to server
-void send_logoff_msg(int sockfd, int port, struct in_addr client_ip,
-                     struct sockaddr_in client);
+void send_logoff_msg(int sockfd);
 // Send a GET_CLIENTS message to server and get response and return the response
 // string
 char* send_getclients_msg(int sockfd);
@@ -23,5 +22,7 @@ void send_useroff_msg(List* list, Tuple tup);
 // Create a string with file-version tuples and send it to client who made
 // request
 void send_file_list(Pathlist* list, int sockfd);
+// Send a GET_FILE_LIST message to socket
+void send_getfilelist_msg(int sock);
 
 #endif

@@ -105,7 +105,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         else {
             Cb_data *data = malloc(sizeof(Cb_data));
             data->pathname[0] = '\0';
-            data->version = 0;
+            data->version = -1;
             data->ip_address = ip;
             data->port_num = port;
             if (push_back_circ_buf(cb, data) == 1) {
@@ -124,9 +124,10 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
             printf(RED "Tuple doesn't exist.\n" RESET);
         }
     } else if (strcmp(words[0], "GET_FILE_LIST") == 0) {
-        Pathlist *list = initialize_pathlist();
-        list_files(list, dirname);
-        send_file_list(list, sockfd);
-        print_pathlist(list);
+        printf("ASKED FOR FILE LIST\n");
+        // Pathlist *list = initialize_pathlist();
+        // list_files(list, dirname);
+        // send_file_list(list, sockfd);
+        // print_pathlist(list);
     }
 }

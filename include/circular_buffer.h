@@ -8,6 +8,8 @@
 
 #include <netinet/in.h>
 
+extern pthread_cond_t empty_cond;
+
 typedef struct Circular_buffer {
     void *buffer;      // data buffer
     void *buffer_end;  // end of data buffer

@@ -55,12 +55,23 @@ int main(int argc, char const *argv[]) {
     // start new session with server and send LOG_ON message with this client's
     // info
     int sock = start_new_session(serverptr, server, clientptr, client);
-    send_logon_msg(sock, port, client_ip, client);
+    send_logon_msg(sock, client_ip, client);
 
     // initialize list to store other clients' info
     List *client_list = initialize_list();
     // initialize citcular buffer
     Circular_buffer *cb = initialize_circ_buf(bufsize, sizeof(Cb_data));
+
+    // create struct with shared variables to pass as argument to threads
+    Arg_struct *thr_args = malloc(sizeof(Arg_struct));
+    thr_args->cb = cb;
+    thr_args->client_list = client_list;
+    strcpy(thr_args->backup_dirname, backup_dirname);
+    thr_args->this_ip_address = client.sin_addr;
+    thr_args->this_port_num = client.sin_port;
+    pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
+    // create worker threads
+    create_n_threads(worker_threads_num, thr_args, t_ids);
 
     // ask server for client list
     char *client_list_msg = send_getclients_msg(sock);
@@ -73,15 +84,6 @@ int main(int argc, char const *argv[]) {
     print_list(client_list);
     printf("Buffer is: \n");
     print_circ_buf(cb);
-
-    // create struct with shared variables to pass as argument to threads
-    Arg_struct *thr_args = malloc(sizeof(Arg_struct));
-    thr_args->cb = cb;
-    thr_args->client_list = client_list;
-    strcpy(thr_args->backup_dirname, backup_dirname);
-    pthread_t *t_ids = malloc(worker_threads_num * sizeof(pthread_t));
-    // create worker threads
-    create_n_threads(worker_threads_num, thr_args, t_ids);
 
     struct sockaddr_in other_client;
     socklen_t other_clientlen;
@@ -112,12 +114,12 @@ int main(int argc, char const *argv[]) {
             // send message LOG_OFF to server
             int serv_sock =
                 start_new_session(serverptr, server, clientptr, client);
-            send_logoff_msg(serv_sock, port, client_ip, client);
+            send_logoff_msg(serv_sock);
             close(serv_sock);
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
             printf("Exit!\n");
-            exit(EXIT_FAILURE);
+            exit(EXIT_SUCCESS);
         } else if (err < 0) {
             perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);

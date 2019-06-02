@@ -1,9 +1,6 @@
 NOTES:
-- versions?????
-- blocking vs reading when buffer is empty
-- xreazetai na apothikeuo se lista ta files kai ta versions i ta vrisko ekeini tin ora an xreiastei
-- megethos buffer gia metafora arxeiou
-- warning gia megethos buffer 128 
+- broadcast vs signal on conditional variables
+- posoi mutex
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
@@ -13,11 +10,14 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
-- before log_off message, stop threads and free memory
+- before log_off message free memory
 - get file
+- version hash
+- remove unecessary printfs
 - generally break functions to more files
-- make threads start reading from buffer
+- thread cancelling problem
 
 READ_ME:
 - request format (how request strings are given in sockets)
 - backup directory structure
+- how pathnames are initialized in buffer

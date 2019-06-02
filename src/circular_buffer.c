@@ -1,10 +1,16 @@
 #include "../include/circular_buffer.h"
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../include/defines.h"
 
+pthread_cond_t empty_cond;
+
 Circular_buffer *initialize_circ_buf(int capacity, int item_size) {
+    // initialize conditional variable
+    pthread_cond_init(&empty_cond, NULL);
+
     Circular_buffer *cb = malloc(sizeof(Circular_buffer));
     cb->buffer = malloc(capacity * item_size);
     cb->buffer_end = (char *)cb->buffer + capacity * item_size;
@@ -32,6 +38,7 @@ int push_back_circ_buf(Circular_buffer *cb, const void *item) {
         cb->head = cb->buffer;
     }
     cb->count++;
+    pthread_cond_signal(&empty_cond);
     return 0;
 }
 

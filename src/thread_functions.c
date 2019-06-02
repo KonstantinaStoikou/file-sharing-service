@@ -1,7 +1,13 @@
 #include "../include/thread_functions.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "../include/defines.h"
+#include "../include/send_functions.h"
+#include "../include/session_functions.h"
+
+pthread_mutex_t buf_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t empty_cond;
 
 void create_n_threads(int worker_threads_num, Arg_struct *args,
                       pthread_t *t_ids) {
@@ -34,10 +40,38 @@ void *read_from_buffer(void *args) {
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     printf("Thread %ld created!\n", pthread_self());
+    Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
+        // pthread_mutex_lock(&buf_mutex);
+        pthread_cond_wait(&empty_cond, &buf_mutex);
+        Cb_data *item = malloc(sizeof(Cb_data));
+        pop_front_circ_buf(cb, item);
+        printf("Item: %d %d %s %d\n", item->ip_address.s_addr, item->port_num,
+               item->pathname, item->version);
+        // if version is -1 then send GET_FILE_LIST to other client
+        if (item->version == -1) {
+            struct sockaddr_in client;
+            struct sockaddr *clientptr = (struct sockaddr *)&client;
+            client.sin_family = AF_INET;  // internet domain
+            client.sin_addr = item->ip_address;
+            client.sin_port = item->port_num;
+
+            int newsock;
+            // create socket
+            if ((newsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+                perror(RED "Error while creating socket" RESET);
+                exit(EXIT_FAILURE);
+            }
+            if (connect(newsock, clientptr, sizeof(client)) < 0) {
+                perror(RED "Error while connecting" RESET);
+                exit(EXIT_FAILURE);
+            }
+            send_getfilelist_msg(newsock);
+            close(newsock);
+        }
+
+        // pthread_mutex_unlock(&buf_mutex);
     }
-    print_circ_buf(((Arg_struct *)args)->cb);
-    printf("Thread %ld exits!\n", pthread_self());
     pthread_exit(NULL);
 }

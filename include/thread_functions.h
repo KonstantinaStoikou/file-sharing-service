@@ -6,10 +6,14 @@
 #include "defines.h"
 #include "list.h"
 
+extern pthread_mutex_t buf_mutex;
+
 typedef struct Arg_struct {
     Circular_buffer *cb;
     List *client_list;
     char backup_dirname[DIRNAME_SIZE];
+    struct in_addr this_ip_address;
+    unsigned short this_port_num;
 } Arg_struct;
 
 // Create N worker threads
