@@ -143,7 +143,6 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         char old_md5[MD5_SIZE];
         strcpy(old_md5, get_md5_hash(filepath));
         if (strcmp(old_md5, version) == 0) {
-            printf("filepath %s up to date\n", filepath);
             if (write(sockfd, "FILE_UP_TO_DATE", ERROR_MSG_SIZE) < 0) {
                 perror(RED "Error writing to socket" RESET);
                 exit(EXIT_FAILURE);

@@ -37,14 +37,12 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
             perror(RED "Error while canceling threads");
             exit(EXIT_FAILURE);
         }
-        printf("Thread %ld killed.\n", t_ids[i]);
         pthread_mutex_unlock(&empty_mutex);
         pthread_mutex_unlock(&full_mutex);
         if (pthread_join(t_ids[i], NULL) != 0) {
             perror(RED "Error while waiting for threads to terminate" RESET);
             exit(EXIT_FAILURE);
         }
-        printf("WAITED\n");
     }
     pthread_cond_destroy(&empty_cond);
     pthread_cond_destroy(&full_cond);
