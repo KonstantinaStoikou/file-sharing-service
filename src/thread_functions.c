@@ -61,7 +61,7 @@ void *read_from_buffer(void *args) {
         pthread_cond_wait(&empty_cond, &empty_mutex);
         printf("stopped waiting\n");
         // }
-        // print_circ_buf(cb);
+        print_circ_buf(cb);
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
         printf("Item %d %d %s %s\n", item->ip_address.s_addr, item->port_num,

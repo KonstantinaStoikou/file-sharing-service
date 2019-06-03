@@ -145,7 +145,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
             }
         } else {
             // check if file exists in backup folder
-            if (version == 0) {
+            if (strcmp(version, "0") == 0) {
                 send_file_msg(sockfd, original_path, version);
             } else {
                 // check if version is the same with already existing file

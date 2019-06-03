@@ -2,8 +2,6 @@ NOTES:
 
 TERMINAL COMMANDS:
 check listening ports:  sudo ss -lntu
-send message to server: echo "hello" | nc 127.0.0.1 8888
-free port numbers:      49152 - 65535
 
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
