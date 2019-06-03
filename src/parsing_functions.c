@@ -46,6 +46,7 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
                 if (push_back_circ_buf(cb, data) == 1) {
                     printf(RED "Buffer is full, item couldn't be added." RESET);
                 }
+                free(data);
             }
         }
         count++;

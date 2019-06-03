@@ -1,6 +1,7 @@
 #include "../include/thread_functions.h"
 #include <arpa/inet.h>
 #include <libgen.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,7 @@
 #include "../include/read_functions.h"
 #include "../include/send_functions.h"
 #include "../include/session_functions.h"
+#include "../include/signal_handlers.h"
 
 pthread_mutex_t empty_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t full_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -35,16 +37,19 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
             perror(RED "Error while canceling threads");
             exit(EXIT_FAILURE);
         }
-        printf("Thread %ld cancelled\n", t_ids[i]);
+        printf("Thread %ld killed.\n", t_ids[i]);
+        pthread_mutex_unlock(&empty_mutex);
+        pthread_mutex_unlock(&full_mutex);
         if (pthread_join(t_ids[i], NULL) != 0) {
             perror(RED "Error while waiting for threads to terminate" RESET);
             exit(EXIT_FAILURE);
         }
-        pthread_cond_destroy(&empty_cond);
-        pthread_cond_destroy(&full_cond);
-        pthread_mutex_destroy(&empty_mutex);
-        pthread_mutex_destroy(&full_mutex);
+        printf("WAITED\n");
     }
+    pthread_cond_destroy(&empty_cond);
+    pthread_cond_destroy(&full_cond);
+    pthread_mutex_destroy(&empty_mutex);
+    pthread_mutex_destroy(&full_mutex);
 }
 
 void *read_from_buffer(void *args) {
@@ -56,6 +61,10 @@ void *read_from_buffer(void *args) {
     while (1) {
         // wait if buffer is empty
         pthread_cond_wait(&empty_cond, &empty_mutex);
+        if (cb->count == 0) {
+            pthread_exit(NULL);
+        }
+
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
         // connect to client
