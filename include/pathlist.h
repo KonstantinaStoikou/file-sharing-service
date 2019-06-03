@@ -34,6 +34,6 @@ Pathlist_node *search_pathlist_node(Pathlist *list, char *data);
 // Print all paths in the list
 void print_pathlist(Pathlist *list);
 // Release memory of list
-void delete_Pathlist(Pathlist *list);
+void delete_pathlist(Pathlist *list);
 
 #endif

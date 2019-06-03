@@ -109,6 +109,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
             if (push_back_circ_buf(cb, data) == 1) {
                 printf(RED "Buffer is full, item couldn't be added." RESET);
             }
+            free(data);
         }
     } else if (strcmp(words[0], "USER_OFF") == 0) {
         struct in_addr ip;
@@ -125,6 +126,7 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         Pathlist *list = initialize_pathlist();
         list_files(list, dirname);
         send_file_list(list, sockfd);
+        delete_pathlist(list);
     } else if (strcmp(words[0], "GET_FILE") == 0) {
         char filepath[PATH_SIZE];
         strcpy(filepath, words[1]);

@@ -111,6 +111,12 @@ int main(int argc, char const *argv[]) {
             close(serv_sock);
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
+            delete_list(client_list);
+            delete_circ_buf(cb);
+            free(dirname);
+            free(server_ip);
+            free(t_ids);
+            free(thr_args);
             printf(GREEN "Exit.\n" RESET);
             exit(EXIT_SUCCESS);
         } else if (err < 0) {

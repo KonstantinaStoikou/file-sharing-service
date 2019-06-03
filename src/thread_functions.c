@@ -36,19 +36,19 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
             exit(EXIT_FAILURE);
         }
         printf("Thread %ld cancelled\n", t_ids[i]);
-        // if (pthread_join(t_ids[i], NULL) != 0) {
-        //     perror(RED "Error while waiting for threads to terminate" RESET);
-        //     exit(EXIT_FAILURE);
-        // }
-        // pthread_cond_destroy(&empty_cond);
-        // pthread_cond_destroy(&full_cond);
-        // pthread_mutex_destroy(&empty_mutex);
-        // pthread_mutex_destroy(&full_mutex);
+        if (pthread_join(t_ids[i], NULL) != 0) {
+            perror(RED "Error while waiting for threads to terminate" RESET);
+            exit(EXIT_FAILURE);
+        }
+        pthread_cond_destroy(&empty_cond);
+        pthread_cond_destroy(&full_cond);
+        pthread_mutex_destroy(&empty_mutex);
+        pthread_mutex_destroy(&full_mutex);
     }
 }
 
 void *read_from_buffer(void *args) {
-    // pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     Circular_buffer *cb = ((Arg_struct *)args)->cb;

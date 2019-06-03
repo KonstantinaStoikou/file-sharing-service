@@ -111,6 +111,7 @@ void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
     if (push_back_circ_buf(cb, data) == 1) {
         printf(RED "Buffer is full, item couldn't be added." RESET);
     }
+    free(data);
 }
 
 int parse_file(char *str, char *file_cont) {
