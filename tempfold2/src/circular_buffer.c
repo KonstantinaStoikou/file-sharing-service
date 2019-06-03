@@ -40,22 +40,20 @@ int push_back_circ_buf(Circular_buffer *cb, const void *item) {
     }
     cb->count++;
     pthread_cond_signal(&empty_cond);
-
     return 0;
 }
 
 void pop_front_circ_buf(Circular_buffer *cb, void *item) {
     if (cb->count == 0) {
         printf(RED "No items in circular buffer." RESET);
-        return;
     }
     memcpy(item, cb->tail, cb->item_size);
     cb->tail = (char *)cb->tail + cb->item_size;
     if (cb->tail == cb->buffer_end) {
         cb->tail = cb->buffer;
     }
-    cb->count--;
     pthread_cond_signal(&full_cond);
+    cb->count--;
 }
 
 void print_circ_buf(Circular_buffer *cb) {

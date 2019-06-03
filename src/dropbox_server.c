@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
     server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(port);
 
-    printf("This server has port: %d, address: %s\n", server.sin_port,
+    printf("This server has port: %d, address: %s\n", port,
            inet_ntoa(server_ip));
 
     int sock = start_listening_port(serverptr, server);

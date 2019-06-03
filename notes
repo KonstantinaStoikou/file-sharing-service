@@ -8,8 +8,6 @@ free port numbers:      49152 - 65535
 ./dropbox_client -d hello -p 50000 -w 10 -b 100 -sp 8888 -sip localhost
 
 TO DO:
-- before log_off message free memory
-- thread cancelling problem
 - test on university linux
 - make readme
 
@@ -18,3 +16,4 @@ READ_ME:
 - backup directory structure
 - how pathnames are initialized in buffer
 - version 0 when file doesn't exist, -1 when tuple without file
+- when in same machine -sip localhost

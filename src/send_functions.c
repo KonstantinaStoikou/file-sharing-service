@@ -184,7 +184,6 @@ void send_getfile_msg(int sock, char *path, char *version) {
 }
 
 void send_file_msg(int sock, char *path, char *version) {
-    char msg[FILE_BYTES_SIZE];
     int size;
     FILE *fp = fopen(path, "r");
     fseek(fp, 0L, SEEK_END);
@@ -194,6 +193,7 @@ void send_file_msg(int sock, char *path, char *version) {
     char *str = malloc(size + 1);
     fread(str, 1, size, fp);
     fclose(fp);
+    char msg[FILE_BYTES_SIZE];
     sprintf(msg, "FILE_SIZE %s %d %s", version, size, str);
     if (write(sock, msg, FILE_BYTES_SIZE) < 0) {
         perror(RED "Error writing to socket" RESET);

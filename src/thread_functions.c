@@ -16,8 +16,6 @@
 
 pthread_mutex_t empty_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t full_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t empty_cond;
-pthread_cond_t full_cond;
 
 void create_n_threads(int worker_threads_num, Arg_struct *args,
                       pthread_t *t_ids) {
@@ -58,13 +56,16 @@ void *read_from_buffer(void *args) {
     // read from circular buffer continuously
     while (1) {
         // wait if buffer is empty
+        // if (cb->count == 0) {
+        printf("waiting...\n");
         pthread_cond_wait(&empty_cond, &empty_mutex);
-        if (cb->count == 0) {
-            pthread_exit(NULL);
-        }
-
+        printf("stopped waiting\n");
+        // }
+        // print_circ_buf(cb);
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
+        printf("Item %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
+               item->pathname, item->version);
         // connect to client
         struct sockaddr_in client;
         struct sockaddr *clientptr = (struct sockaddr *)&client;
@@ -107,23 +108,20 @@ void *read_from_buffer(void *args) {
                 exit(EXIT_FAILURE);
             }
             char file_cont[FILE_BYTES_SIZE];
+            printf("msg received: %s\n", msg);
             // if a file was written in socket, create it
             if (parse_file(msg, file_cont) == 0) {
                 // form backup subdirectory path for this client
-                char filepath[BUF_SIZE];
-                sprintf(filepath, "%s/%s_%d/%s",
-                        ((Arg_struct *)args)->backup_dirname,
-                        inet_ntoa(client.sin_addr), ntohs(client.sin_port),
-                        item->pathname);
+                char pathname_copy[BUF_SIZE];
+                strcpy(pathname_copy, item->pathname);
                 char cmd[BUF_SIZE];
-                char filepath_copy[BUF_SIZE];
-                strcpy(filepath_copy, filepath);
-                sprintf(cmd, "mkdir -p %s && touch %s", dirname(filepath_copy),
-                        filepath);
+                sprintf(cmd, "mkdir -p %s && touch %s", dirname(pathname_copy),
+                        item->pathname);
                 // execute mkdir and touch
+                printf("cmd: %s\n", cmd);
                 system(cmd);
                 // write file contents to file
-                FILE *fp = fopen(filepath, "ab");
+                FILE *fp = fopen(item->pathname, "w");
                 if (fp != NULL) {
                     fputs(file_cont, fp);
                     fclose(fp);

@@ -6,8 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+gggggggggggggggggggggggggggggggggggggggggg
 #include "include/circular_buffer.h"
-dgdfgdfg int main(int argc, char const *argv[]) {
+    dgdfgdfg int
+    main(int argc, char const *argv[]) {
     // Circular_buffer *cb = initialize_circ_buf(5, sizeof(Cb_data));
 
     // Cb_data *data1 = malloc(sizeof(Cb_data));

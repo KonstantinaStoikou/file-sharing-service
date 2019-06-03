@@ -89,11 +89,11 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
             if (access(filepath, F_OK) != -1) {
                 // file already exists
                 // add to circular buffer
-                add_file_to_buffer(cb, path, version, ip_address, port_num);
+                add_file_to_buffer(cb, filepath, version, ip_address, port_num);
             } else {
                 // file doesn't exist
                 // add to circular buffer
-                add_file_to_buffer(cb, path, "0", ip_address, port_num);
+                add_file_to_buffer(cb, filepath, "0", ip_address, port_num);
             }
         }
         count++;
@@ -110,7 +110,7 @@ void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
     data->ip_address.s_addr = ip_address.s_addr;
     data->port_num = port_num;
     if (push_back_circ_buf(cb, data) == 1) {
-        printf(RED "Buffer is full, item couldn't be added." RESET);
+        printf(RED "Buffer is full, item couldn't be added.\n" RESET);
     }
     free(data);
 }

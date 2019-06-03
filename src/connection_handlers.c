@@ -132,23 +132,40 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
         strcpy(filepath, words[1]);
         char version[MD5_SIZE];
         strcpy(version, words[2]);
-        // check if file exists
-        if (access(filepath, F_OK) == -1) {
+        char *original_path;
+        original_path = strstr(filepath, "/");
+        original_path = strstr(++original_path, "/");
+        original_path++;
+        original_path++;
+        // check if file exists in original directory
+        if (access(original_path, F_OK) == -1) {
             if (write(sockfd, "FILE_NOT_FOUND", ERROR_MSG_SIZE) < 0) {
                 perror(RED "Error writing to socket" RESET);
                 exit(EXIT_FAILURE);
             }
-        }
-        // check if version is the same with already existing file
-        char old_md5[MD5_SIZE];
-        strcpy(old_md5, get_md5_hash(filepath));
-        if (strcmp(old_md5, version) == 0) {
-            if (write(sockfd, "FILE_UP_TO_DATE", ERROR_MSG_SIZE) < 0) {
-                perror(RED "Error writing to socket" RESET);
-                exit(EXIT_FAILURE);
-            }
         } else {
-            send_file_msg(sockfd, filepath, version);
+            // check if file exists in backup folder
+            if (version == 0) {
+                printf("File to send when no version: %s\n", original_path);
+                send_file_msg(sockfd, original_path, version);
+            } else {
+                // check if version is the same with already existing file
+                char old_md5[MD5_SIZE];
+                strcpy(old_md5, get_md5_hash(filepath));
+
+                printf("Filepath: %s: Old version: %s vs new version: %s\n",
+                       filepath, old_md5, version);
+                if (strcmp(old_md5, version) == 0) {
+                    if (write(sockfd, "FILE_UP_TO_DATE", ERROR_MSG_SIZE) < 0) {
+                        perror(RED "Error writing to socket" RESET);
+                        exit(EXIT_FAILURE);
+                    }
+                } else {
+                    printf("File to send when new version: %s\n",
+                           original_path);
+                    send_file_msg(sockfd, original_path, version);
+                }
+            }
         }
     }
 }
