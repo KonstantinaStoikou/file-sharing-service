@@ -6,7 +6,8 @@
 #include "defines.h"
 #include "list.h"
 
-extern pthread_mutex_t buf_mutex;
+extern pthread_mutex_t empty_mutex;
+extern pthread_mutex_t full_mutex;
 
 typedef struct Arg_struct {
     Circular_buffer *cb;

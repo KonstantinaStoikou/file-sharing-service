@@ -6,6 +6,7 @@
 #include "../include/defines.h"
 
 pthread_cond_t empty_cond;
+pthread_cond_t full_cond;
 
 Circular_buffer *initialize_circ_buf(int capacity, int item_size) {
     // initialize conditional variable
@@ -51,6 +52,7 @@ void pop_front_circ_buf(Circular_buffer *cb, void *item) {
     if (cb->tail == cb->buffer_end) {
         cb->tail = cb->buffer;
     }
+    pthread_cond_signal(&full_cond);
     cb->count--;
 }
 

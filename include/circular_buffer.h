@@ -10,6 +10,7 @@
 #include "defines.h"
 
 extern pthread_cond_t empty_cond;
+extern pthread_cond_t full_cond;
 
 typedef struct Circular_buffer {
     void *buffer;      // data buffer

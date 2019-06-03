@@ -14,6 +14,7 @@
 #include "../include/list.h"
 #include "../include/read_functions.h"
 #include "../include/session_functions.h"
+#include "../include/signal_handlers.h"
 
 int main(int argc, char const *argv[]) {
     int port;
@@ -36,6 +37,12 @@ int main(int argc, char const *argv[]) {
 
     int sock = start_listening_port(serverptr, server);
 
+    // set signal handler
+    struct sigaction act;
+    act.sa_handler = exit_action;
+    act.sa_flags = 0;
+    sigaction(SIGINT, &act, NULL);
+
     // set of socket descriptors
     fd_set active_fd_set, read_fd_set;
     // initialize the set of active sockets
@@ -48,7 +55,13 @@ int main(int argc, char const *argv[]) {
     while (1) {
         // block until input arrives on one or more active sockets
         read_fd_set = active_fd_set;
-        if (select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
+        int err = select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL);
+        if (err < 0 && exit_var == 1) {
+            close(sock);
+            delete_list(client_list);
+            printf(GREEN "Exit.\n" RESET);
+            exit(EXIT_SUCCESS);
+        } else if (err < 0) {
             perror(RED "Error in select" RED);
             exit(EXIT_FAILURE);
         }

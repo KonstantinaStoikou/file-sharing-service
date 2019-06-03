@@ -12,8 +12,10 @@
 #include "../include/send_functions.h"
 #include "../include/session_functions.h"
 
-pthread_mutex_t buf_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t empty_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t full_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t empty_cond;
+pthread_cond_t full_cond;
 
 void create_n_threads(int worker_threads_num, Arg_struct *args,
                       pthread_t *t_ids) {
@@ -38,22 +40,24 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
         //     perror(RED "Error while waiting for threads to terminate" RESET);
         //     exit(EXIT_FAILURE);
         // }
+        // pthread_cond_destroy(&empty_cond);
+        // pthread_cond_destroy(&full_cond);
+        // pthread_mutex_destroy(&empty_mutex);
+        // pthread_mutex_destroy(&full_mutex);
     }
 }
 
 void *read_from_buffer(void *args) {
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    // pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        pthread_cond_wait(&empty_cond, &buf_mutex);
+        // wait if buffer is empty
+        pthread_cond_wait(&empty_cond, &empty_mutex);
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
-        printf("Item: %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
-               item->pathname, item->version);
-
         // connect to client
         struct sockaddr_in client;
         struct sockaddr *clientptr = (struct sockaddr *)&client;
@@ -85,7 +89,7 @@ void *read_from_buffer(void *args) {
                 mkdir(dirpath, 0700);
             }
             parse_file_list(msg, cb, dirpath, newsock, client.sin_addr,
-                            client.sin_port);
+                            client.sin_port, &full_mutex, &full_cond);
         }
         // else send GET_FILE to other client
         else {
