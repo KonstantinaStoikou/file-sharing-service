@@ -108,7 +108,6 @@ void *read_from_buffer(void *args) {
                 exit(EXIT_FAILURE);
             }
             char file_cont[FILE_BYTES_SIZE];
-            printf("msg received: %s\n", msg);
             // if a file was written in socket, create it
             if (parse_file(msg, file_cont) == 0) {
                 // form backup subdirectory path for this client
@@ -118,7 +117,6 @@ void *read_from_buffer(void *args) {
                 sprintf(cmd, "mkdir -p %s && touch %s", dirname(pathname_copy),
                         item->pathname);
                 // execute mkdir and touch
-                printf("cmd: %s\n", cmd);
                 system(cmd);
                 // write file contents to file
                 FILE *fp = fopen(item->pathname, "w");
