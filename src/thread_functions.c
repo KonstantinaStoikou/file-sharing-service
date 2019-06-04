@@ -43,14 +43,18 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
     pthread_mutex_destroy(&mutex);
 }
 
+void function(void *item) { free(item); }
+
 void *read_from_buffer(void *args) {
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
+    Cb_data *item = malloc(sizeof(Cb_data));
+    pthread_cleanup_push(&function, (void *)item);
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        Cb_data *item = malloc(sizeof(Cb_data));
+        // Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
         pthread_cond_signal(&full_cond);
 
@@ -115,7 +119,8 @@ void *read_from_buffer(void *args) {
             }
         }
         close(newsock);
-        free(item);
+        // free(item);
     }
+    pthread_cleanup_pop(1);
     pthread_exit(NULL);
 }

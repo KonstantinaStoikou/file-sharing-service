@@ -199,4 +199,5 @@ void send_file_msg(int sock, char *path, char *version) {
         perror(RED "Error writing to socket" RESET);
         exit(EXIT_FAILURE);
     }
+    free(str);
 }
