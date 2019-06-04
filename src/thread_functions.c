@@ -55,7 +55,7 @@ void *read_from_buffer(void *args) {
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        // wait if buffer is empty
+        // // wait if buffer is empty
         // if (cb->count == 0) {
         printf("waiting...\n");
         pthread_cond_wait(&empty_cond, &empty_mutex);
