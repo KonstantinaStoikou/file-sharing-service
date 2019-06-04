@@ -5,7 +5,6 @@
 #include <string.h>
 #include "../include/defines.h"
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t empty_cond;
 pthread_cond_t full_cond;
 
@@ -30,10 +29,9 @@ void delete_circ_buf(Circular_buffer *cb) {
     free(cb);
 }
 
-void push_back_circ_buf(Circular_buffer *cb, const void *item) {
-    pthread_mutex_lock(&mutex);
+int push_back_circ_buf(Circular_buffer *cb, const void *item) {
     if (cb->count == cb->capacity) {
-        pthread_cond_wait(&full_cond, &mutex);
+        return 1;
     }
     memcpy(cb->head, item, cb->item_size);
     cb->head = (char *)cb->head + cb->item_size;
@@ -41,21 +39,21 @@ void push_back_circ_buf(Circular_buffer *cb, const void *item) {
         cb->head = cb->buffer;
     }
     cb->count++;
-    pthread_mutex_unlock(&mutex);
+    pthread_cond_signal(&empty_cond);
+    return 0;
 }
 
 void pop_front_circ_buf(Circular_buffer *cb, void *item) {
-    pthread_mutex_lock(&mutex);
     if (cb->count == 0) {
-        pthread_cond_wait(&empty_cond, &mutex);
+        printf(RED "No items in circular buffer." RESET);
     }
     memcpy(item, cb->tail, cb->item_size);
     cb->tail = (char *)cb->tail + cb->item_size;
     if (cb->tail == cb->buffer_end) {
         cb->tail = cb->buffer;
     }
+    pthread_cond_signal(&full_cond);
     cb->count--;
-    pthread_mutex_unlock(&mutex);
 }
 
 void print_circ_buf(Circular_buffer *cb) {

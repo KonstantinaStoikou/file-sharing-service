@@ -43,9 +43,8 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
                 strcpy(data->version, "-1");
                 data->ip_address = ip;
                 data->port_num = port;
-                if (push_back_circ_buf(cb, data) == 1) {
-                    printf(RED "Buffer is full, item couldn't be added." RESET);
-                }
+                push_back_circ_buf(cb, data);
+                pthread_cond_signal(&empty_cond);
                 free(data);
             }
         }
@@ -55,8 +54,7 @@ void parse_client_list(char *str, List *list, Circular_buffer *cb) {
 }
 
 void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
-                     struct in_addr ip_address, unsigned short port_num,
-                     pthread_mutex_t *mutex, pthread_cond_t *cond) {
+                     struct in_addr ip_address, unsigned short port_num) {
     // message form: FILE_LIST N filepath1,version1 filepath2,version2 ...
     // break message into words
     int count = 0;
@@ -82,10 +80,6 @@ void parse_file_list(char *str, Circular_buffer *cb, char *dirname, int sock,
             // check if this file already exists in backup subdirectory
             char filepath[DIRPATH_SIZE + PATH_SIZE];
             sprintf(filepath, "%s/%s", dirname, path);
-            // wait if buffer is full
-            if (cb->count == cb->capacity) {
-                pthread_cond_wait(cond, mutex);
-            }
             if (access(filepath, F_OK) != -1) {
                 // file already exists
                 // add to circular buffer
@@ -109,9 +103,8 @@ void add_file_to_buffer(Circular_buffer *cb, char *path, char *version,
     strcpy(data->version, version);
     data->ip_address.s_addr = ip_address.s_addr;
     data->port_num = port_num;
-    if (push_back_circ_buf(cb, data) == 1) {
-        printf(RED "Buffer is full, item couldn't be added.\n" RESET);
-    }
+    push_back_circ_buf(cb, data);
+    pthread_cond_signal(&empty_cond);
     free(data);
 }
 

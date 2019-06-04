@@ -2,10 +2,12 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "../include/circular_buffer.h"
 #include "../include/defines.h"
 #include "../include/dir_functions.h"
 #include "../include/read_functions.h"
@@ -106,9 +108,8 @@ void handle_client_connection(int sockfd, List *list, struct sockaddr_in client,
             strcpy(data->version, "-1");
             data->ip_address = ip;
             data->port_num = port;
-            if (push_back_circ_buf(cb, data) == 1) {
-                printf(RED "Buffer is full, item couldn't be added." RESET);
-            }
+            push_back_circ_buf(cb, data);
+            pthread_cond_signal(&empty_cond);
             free(data);
         }
     } else if (strcmp(words[0], "USER_OFF") == 0) {

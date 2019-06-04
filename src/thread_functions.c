@@ -14,9 +14,6 @@
 #include "../include/session_functions.h"
 #include "../include/signal_handlers.h"
 
-pthread_mutex_t empty_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t full_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 void create_n_threads(int worker_threads_num, Arg_struct *args,
                       pthread_t *t_ids) {
     // create worker threads
@@ -35,8 +32,7 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
             perror(RED "Error while canceling threads");
             exit(EXIT_FAILURE);
         }
-        pthread_mutex_unlock(&empty_mutex);
-        pthread_mutex_unlock(&full_mutex);
+        pthread_mutex_unlock(&mutex);
         if (pthread_join(t_ids[i], NULL) != 0) {
             perror(RED "Error while waiting for threads to terminate" RESET);
             exit(EXIT_FAILURE);
@@ -44,8 +40,7 @@ void stop_threads(int worker_threads_num, pthread_t *t_ids) {
     }
     pthread_cond_destroy(&empty_cond);
     pthread_cond_destroy(&full_cond);
-    pthread_mutex_destroy(&empty_mutex);
-    pthread_mutex_destroy(&full_mutex);
+    pthread_mutex_destroy(&mutex);
 }
 
 void *read_from_buffer(void *args) {
@@ -55,17 +50,10 @@ void *read_from_buffer(void *args) {
     Circular_buffer *cb = ((Arg_struct *)args)->cb;
     // read from circular buffer continuously
     while (1) {
-        // // wait if buffer is empty
-        // if (cb->count == 0) {
-        printf("waiting...\n");
-        pthread_cond_wait(&empty_cond, &empty_mutex);
-        printf("stopped waiting\n");
-        // }
-        print_circ_buf(cb);
         Cb_data *item = malloc(sizeof(Cb_data));
         pop_front_circ_buf(cb, item);
-        printf("Item %d %d %s %s\n", item->ip_address.s_addr, item->port_num,
-               item->pathname, item->version);
+        pthread_cond_signal(&full_cond);
+
         // connect to client
         struct sockaddr_in client;
         struct sockaddr *clientptr = (struct sockaddr *)&client;
@@ -97,7 +85,7 @@ void *read_from_buffer(void *args) {
                 mkdir(dirpath, 0700);
             }
             parse_file_list(msg, cb, dirpath, newsock, client.sin_addr,
-                            client.sin_port, &full_mutex, &full_cond);
+                            client.sin_port);
         }
         // else send GET_FILE to other client
         else {

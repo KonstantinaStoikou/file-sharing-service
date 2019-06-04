@@ -112,8 +112,6 @@ int main(int argc, char const *argv[]) {
             // stop all threads
             stop_threads(worker_threads_num, t_ids);
             delete_list(client_list);
-            printf(GREEN "Remaining buffer.\n" RESET);
-            print_circ_buf(cb);
             delete_circ_buf(cb);
             free(dirname);
             free(server_ip);

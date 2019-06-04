@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include "defines.h"
 
+extern pthread_mutex_t mutex;
 extern pthread_cond_t empty_cond;
 extern pthread_cond_t full_cond;
 
@@ -33,9 +34,8 @@ typedef struct Cb_data {
 Circular_buffer *initialize_circ_buf(int capacity, int item_size);
 // Release memory of circular buffer
 void delete_circ_buf(Circular_buffer *cb);
-// Add an item to the back of the circular buffer, return 1 if buffer is full
-// and item can't be added, else return 0
-int push_back_circ_buf(Circular_buffer *cb, const void *item);
+// Add an item to the back of the circular buffer
+void push_back_circ_buf(Circular_buffer *cb, const void *item);
 // Remove an item from the front of the circular buffer
 void pop_front_circ_buf(Circular_buffer *cb, void *item);
 // Print all items in circular buffer
